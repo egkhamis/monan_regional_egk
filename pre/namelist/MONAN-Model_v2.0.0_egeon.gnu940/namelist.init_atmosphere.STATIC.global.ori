@@ -1,0 +1,127 @@
+&nhyd_model
+    config_init_case = 7             ! Type of initial conditions to create:
+                                     ! 1 = Jablonowski & Williamson barolinic wave (no initial perturbation),
+                                     ! 2 = Jablonowski & Williamson barolinic wave (with initial perturbation),
+                                     ! 3 = Jablonowski & Williamson barolinic wave (with normal-mode perturbation),
+                                     ! 4 = squall line,
+                                     ! 5 = super-cell,
+                                     ! 6 = mountain wave,
+                                     ! 7 = real-data initial conditions from, e.g., GFS,
+                                     ! 8 = surface field (SST, sea-ice) update file for use with real-data simulations
+                                     ! 9 = lateral boundary conditions update file for use with real-data simulations
+                                     ! 13 = CAM-MPAS 3-d grid with specified topography and zeta levels
+    config_theta_adv_order = 3       ! Horizontal advection order for theta
+                                     ! 2, 3, or 4 (default: 3)
+    config_coef_3rd_order = 0.25     ! Upwinding coefficient in the 3rd order advection scheme
+                                     ! 0 <= config_coef_3rd_order <= 1 (default: 0.25)
+    config_interface_projection = 'linear_interpolation' !projecting layer values to the interface, linear vertical interpolation or
+                                                         !integral 
+                                                         !'linear_interpolation' or 'layer_integral' (layer average value) 
+                                                         !"(default: linear_interpolation)
+/
+&dimensions
+    config_nvertlevels = 55    !The number of vertical levels to be used in the model
+                               !Positive integer values (default: 55)
+    config_nsoillevels = 1     !The number of vertical soil levels needed by LSM in the model (case 7 only)
+                               !Positive integer values (default: 4)
+    config_nfglevels = 1       !The number of atmospheric levels (including surface and sea-level) in the
+                               !first-guess dataset (cases 7 and 9 only) 
+                               ! Positive integer values (default: 38)
+    config_nfgsoillevels = 1   !The number of vertical soil levels in the first-guess dataset (case 7 only)
+                               !Positive integer values (default: 4)
+    config_gocartlevels = 30   !The number of vertical gocart levels in the climatological gocart data set 
+                               !Positive integer values (default: 30)
+/
+&data_sources
+    config_geog_data_path = '#GEODAT#'    !Path to the WPS static data files (case 7 only)
+    config_met_prefix = 'CFSR'            !Filename prefix of ungrib intermediate file to use for initial conditions
+                                          !(cases 7 and 9 only) not necessary to static files
+                                          !Any alpha-numeric string (default: CFSR)
+    config_sfc_prefix = 'SST'             !Filename prefix of ungrib intermediate file to use for SST and sea-ice
+                                          !(cases 7 and 8 only)
+                                          !Any alpha-numeric string (default: SST)
+    config_fg_interval = 86400            ! Interval between intermediate files (cases 8 and 9 only)
+                                          ![DDD ]hh:mm:ss (default: 86400)
+    config_landuse_data = 'MODIFIED_IGBP_MODIS_NOAH' ! The land use classification to use (case 7 only)
+                                                     !'USGS' or 'MODIFIED_IGBP_MODIS_NOAH' 
+                                                     !(default: MODIFIED_IGBP_MODIS_NOAH)
+    config_topo_data = 'GMTED2010'        !The topography dataset to use for the model terrain and for GWDO static fields 
+                                          !(case 7 only)
+                                          !'GTOPO30' or 'GMTED2010' (default: GMTED2010)
+    config_vegfrac_data = 'MODIS'         ! The climatological monthly vegetation fraction dataset to use (case 7 only)
+                                          ! 'MODIS' or 'NCEP' (default: MODIS)
+    config_albedo_data = 'MODIS'          ! The climatological monthly albedo dataset to use (case 7 only)
+                                          ! 'MODIS' or 'NCEP' (default: MODIS)
+    config_maxsnowalbedo_data = 'MODIS'   ! The maximum snow albedo dataset to use (case 7 only)
+                                          !'MODIS' or 'NCEP' (default: MODIS)
+    config_supersample_factor = 3         ! The supersampling factor to be used for MODIS maximum snow albedo
+                                          ! and monthly albedo datasets (case 7 only)
+                                          ! Positive integer values (default: 3)
+    config_30s_supersample_factor = 1     ! The supersampling factor to be used for 30s terrain, MODIS land use, soil
+                                          ! category, and MODIS FPAR monthly vegetation fraction (case 7 only)
+                                          ! Positive integer values (default: 1)
+    config_use_spechumd = false           ! Whether to use specific-humidity as the first-guess moisture variable. If
+                                          ! this option is False, relative humidity will be used.
+                                          ! true or false (default: false)
+/
+&vertical_grid
+    config_specified_zeta_levels = 'L55.txt' != ''  The name of a text file containing a list of
+                                             ! vertical coordinate (zeta) values in increasing order at 
+                                             !layer interfaces."
+                                             ! cheack     config_nvertlevels = 55     
+                                             !The number of vertical levels to be used in the model
+                                             !Positive integer values (default: 55)
+    config_ztop = 100000.0                 ! Model top height [m]
+                                          ! Positive real values (default: 30000.0)
+    config_nsmterrain = 1                 ! Number of smoothing passes to apply to the interpolated terrain field
+                                          ! Non-negative integer values (default: 1)
+    config_smooth_surfaces = true         ! Whether to smooth zeta surfaces=> Smoothing algorithm for coordinate surfaces
+                                          ! true or false (default: true)
+    config_dzmin = 0.3                    ! Minimum thickness of layers as a fraction of nominal thickness
+                                          ! Real values in the interval (0,..,0.5.., 1) (default: 0.3)
+    config_nsm = 30                       ! Description Maximum number of smoothing passes for coordinate surfaces
+                                          ! Positive integer values (default: 30)
+    config_tc_vertical_grid = true        ! Whether to use the vertical layer profile that was developed for use in
+                                          ! real-time TC experiments
+                                          ! true or false (default: true)
+    config_blend_bdy_terrain = false      ! Whether to blend terrain along domain boundaries with first-guess terrain.
+                                          ! Only useful for limited-area domains. 
+/
+&interpolation_control
+    config_extrap_airtemp = 'lapse-rate'    !Method of extrapolation of air temperature above/below first-guess levels.
+                                            ! 'constant'   (last valid value), 
+                                            ! 'linear'     (linear extrapolation based on last two values),
+                                            ! 'lapse-rate' (0.0065 K/m from last valid value) (default:lapse-rate)
+/
+&preproc_stages
+    config_static_interp = true             ! Whether to interpolate WPS static data (case 7 only)
+                                            ! true or false (default: true)
+    config_native_gwd_static = true         ! Whether to recompute subgrid-scale orography statistics directly on the
+                                            ! native MPAS mesh (case 7 only)
+                                            ! true or false (default: true)
+    config_gwd_cell_scaling = 1.0           ! Scaling factor for the effective grid cell diameter used in computation of
+                                            ! GWD static fields (hidden by default)
+                                            ! Positive real values (default: 1.0)
+    config_vertical_grid = false            ! Whether to generate vertical grid
+                                            ! true or false (default: true)
+    config_met_interp = false               ! Whether to interpolate first-guess fields from intermediate file
+                                            ! true or false (default: true)
+    config_input_sst = false                ! Whether to re-compute SST and sea-ice fields from surface input data set;
+                                            ! should be set to .true. when running case 8
+                                            ! true or false (default: false)
+    config_frac_seaice = false              ! Whether to switch sea-ice threshold from 0.5 to 0.02
+                                            ! true or false (default: true)
+/
+&io
+    config_pio_num_iotasks = 0              ! Number of tasks to perform file I/O
+                                            ! Integer valued, 0 <= config pio num iotasks <= # MPI tasks,
+                                            ! 0 indicates  all tasks perform I/O (default: 0)
+                                            !
+    config_pio_stride = 1                   ! Stride between file I/O tasks
+                                            ! Integer valued, <= (# MPI tasks) / config_pio_num_iotasks (default: 1)
+/
+&decomposition
+                                            ! Prefix of graph decomposition file, to be suffixed with the MPI task count
+                                            ! Any valid filename (default: x1.40962.graph.info.part.)
+    config_block_decomp_file_prefix = '#x1#.#RES#.graph.info.part.'
+/
