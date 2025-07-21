@@ -1,0 +1,348 @@
+&nhyd_model
+    config_time_integration = 'SRK3'          !Time integration scheme (hidden by default)
+                                              !'SRK3' (default: SRK3)
+    config_time_integration_order = 3         ! Order for RK time integration
+                                              ! 2 or 3 (default: 2)
+    config_dt = #STEPMODEL#                    !Model time step, seconds ; an appropriate value must be chosen
+                                               !relative to the grid cell spacing   
+                                               !Positive real values (default: 720.0) 
+    config_calendar_type = 'gregorian'         !Simulation calendar type (hidden by default)
+                                               !'gregorian','gregorian_noleap' (default: gregorian)
+    config_start_time = '#LABELI#'             !Starting time for model simulation
+                                               !'YYYY-MM-DD_hh:mm:ss' (default: 2010-10-23_00:00:00)
+    config_stop_time = '#LABELF#'              ! Stopping time for model simulation (hidden by default)
+                                               !'YYYY-MM-DD hh:mm:ss' (default: none)
+    config_run_duration = 'none' !'5_00:00:00' !Length of model simulation
+                                               ![DDD_]hh:mm:ss (default: 5_00:00:00)
+    config_split_dynamics_transport = true     !Whether to super-cycle scalar transport
+                                               !Logical values (default: true)
+    config_number_of_sub_steps = 2             ! Number of acoustic steps per full RK step
+                                               !Positive, even integer values, typically 2 or 6 
+                                               !depending on transport splitting (default: 2)
+    config_dynamics_split_steps = 3            !When config split dynamics transport = T, 
+                                               !the number of RK steps per transport step
+                                               !Positive integer values (default: 3)
+    config_h_mom_eddy_visc2 = 0.0              ![m^2 s^-1]  nabla^2 eddy viscosity for horizontal diffusion of momentum 
+                                               !(hidden by default)
+                                               !Positive real values (default: 0.0)
+    config_h_mom_eddy_visc4 = 0.0              ![m^4 s^-1] nabla^4 eddy hyper-viscosity for horizontal diffusion of 
+                                               !momentum (hidden by default)
+                                               !Positive real values (default: 0.0)
+    config_v_mom_eddy_visc2 = 0.0              ![m^2 s^-1] nabla^2 eddy viscosity for vertical diffusion of momentum 
+                                               !(hidden by default)
+                                               !Positive real values (default: 0.0)
+    config_h_theta_eddy_visc2 = 0.0            ![m^2 s^-1] nabla^2 eddy viscosity for horizontal diffusion of theta 
+                                               !(hidden by default)
+                                               !Positive real values (default: 0.0)
+    config_h_theta_eddy_visc4 = 0.0            ![m^4 s^-1] nabla4 eddy hyper-viscosity for horizontal diffusion of theta 
+                                               !(hidden by default)
+                                               !Positive real values (default: 0.0)
+    config_v_theta_eddy_visc2 = 0.0            ![m^2 s^-1] nabla^2 eddy viscosity for vertical diffusion of theta 
+                                               !(hidden by default)
+                                               !Positive real values (default: 0.0)
+    config_horiz_mixing = '2d_smagorinsky'     !Formulation of horizontal mixing
+                                               ! '2d_fixed' or '2d_smagorinsky' (default: 2d_smagorinsky)
+    config_len_disp =  #LEN_DISP#              ![m] Horizontal length scale, used by the Smagorinsky formulation
+                                               ! of horizontal diffusion and by 3-d divergence damping 
+                                               !(hidden by default)the smallest cell-to-cell distance in the mesh,
+                                               ! used for computing a dissipation length scale
+                                               !Positive real values. A zero value implies that the length scale 
+                                               !is prescribed by the nominalMinDc value in the input file. 
+                                               !(default: 0.0)
+    config_visc4_2dsmag = 0.05                 !Scaling coefficient of dx^3 to obtain nabla4 diffusion coefficient 
+                                               !Non-negative real values (default: 0.05)
+    config_del4u_div_factor =  10              !Scaling factor for the divergent component of nabla^4 u calculation 
+                                               !(hidden by default)
+                                               !Positive real values (default: 10.0)
+    config_w_adv_order = 4                     !Horizontal advection order for w (hidden by default)
+                                               !2, 3, or 4 (default: 3)
+    config_theta_adv_order = 4                 !Horizontal advection order for theta (hidden by default)
+                                               !2, 3, or 4 (default: 3)
+    config_scalar_adv_order = 4                !Horizontal advection order for scalars (hidden by default)
+                                               !2, 3, or 4 (default: 3)
+    config_u_vadv_order = 4                    !Vertical advection order for normal velocities (u) (hidden by default)
+                                               !2, 3, or 4 (default: 3)
+    config_w_vadv_order = 4                    !Vertical advection order for w (hidden by default)
+                                               !2, 3, or 4 (default: 3)
+    config_theta_vadv_order = 4                !Vertical advection order for theta (hidden by default) 
+                                               ! 2, 3, or 4 (default: 3)            
+    config_scalar_vadv_order = 4               !Vertical advection order for scalars (hidden by default)
+                                               ! 2, 3, or 4 (default: 3)
+                                               !c
+    config_scalar_advection = true             !Whether to advect scalar fields
+                                               !.true. or .false. (default: true)
+    config_positive_definite = false           !Whether to enable positive-definite advection of scalars 
+                                               !(hidden by default)
+                                               !.true. or .false. (default: false)
+    config_monotonic = true                    !Whether to enable monotonic limiter in scalar advection
+                                               !.true. or .false. (default: true)
+    config_coef_3rd_order = 0.25               !Upwinding coefficient in the 3rd order advection scheme
+                                               ! 0 <= config_coef_3rd_order <= 1 (default: 0.25)
+    config_smagorinsky_coef = 0.125            !Dimensionless empirical parameter relating the strain tensor to 
+                                               !the eddy viscosity in the Smagorinsky turbulence model 
+                                               !(hidden by default)
+                                               !Real values typically in the range 0.1 to 0.4 (default: 0.125)
+    config_epssm = 0.1                         !Off-centering parameter for the vertically implicit acoustic
+                                               ! integration
+                                               ! Positive real values (default: 0.1)
+    config_smdiv = 0.1                         !3-d divergence damping coefficient
+                                               !Positive real values (default: 0.1)
+!    config_apvm_upwinding =0.0                 !Amount of upwinding in APVM (hidden by default)
+!                                               !0 <= config apvm upwinding <= 1 (default: 0.5)
+!					       !config_apvm_upwinding  0.0 for 3km resolution
+/
+&limited_area
+config_apply_lbcs = false    !must be set to true only if running a regional simulation,
+                             !as in Section 8.2
+                             !Whether to apply lateral boundary conditions
+                             !true or false; this option must be set to 
+                             !true for limited-area simulations and 
+                             ! false for global simulations (default: false)
+/
+&damping
+    config_zd = 22000.0       ![m] Height MSL to begin w-damping profile
+                              !    Positive real values (default: 22000.0)
+    config_xnutr = 0.2         !    Maximum w-damping coefficient at model top
+                               !   0 <= config_xnutr <= 1 (default: 0.2)
+    config_mpas_cam_coef = 0.0  ! Coefficient for scaling the 2nd-order horizontal 
+                                !mixing in the mpas_cam absorbing layer (hidden by default)
+                                !0 <=config mpas cam coef <=1, standard value is 0.2 (default: 0.0)
+    config_number_cam_damping_levels = 4 !Number of layers in which to apply cam 2nd-order horizontal filter
+                                         ! top of model; viscosity linearly ramps to zero by layer number
+                                         ! from the top (hidden by default)
+                                         ! Positive integer values (default: 4)
+    config_rayleigh_damp_u = .false. !Whether to apply Rayleigh damping on horizontal velocity 
+                                     !in the top most model levels. 
+                                     !The number of levels is specified by the 
+                                     ! config_number_rayleigh_damp_u_levels option, and the damping timescale is specified by the 
+                                     !config_rayleigh_damp_u_timescale_days option. (hidden by default)
+                                     ! .true. or .false. (default: false)
+    config_rayleigh_damp_u_timescale_days =  5.0  ![days]Timescale, in days (86400 s), 
+                                                  !for the Rayleigh damping on horizontal velocity 
+                                                  !in the top-most model levels. (hidden by default)
+                                                  !Positive real values (default: 5.0)
+    config_number_rayleigh_damp_u_levels = 6  !(integer)  Number of layers in which to apply Rayleigh damping 
+                                              !on horizontal velocity at top of model; damping linearly ramps to zero
+                                              ! by layer number from the top (hidden by default)
+                                              ! Positive integer values (default: 6)
+/
+&io
+    config_pio_num_iotasks = 0
+    config_pio_stride = 1
+/
+&decomposition
+    config_block_decomp_file_prefix = '#x1#.#RESNPTS#.graph.info.part.' !if running in parallel, must match the prefix of the
+                                                                      !graph decomposition file
+/
+&restart
+    config_do_restart = #RESTART#          !if true, will select the appropriate restart.nc file generated
+                                                  !from a previous run
+/
+&printout
+    config_print_global_minmax_vel = true
+    config_print_detailed_minmax_vel = false
+/
+&IAU
+    config_IAU_option = 'off'
+    config_IAU_window_length_s = 21600.
+/
+&physics
+    config_sst_update = false                     ! if updating sea-ice and SST with an surface.nc file,
+                                                  ! set to true, and edit the 'surface' stream in the
+                                                  ! streams.atmosphere file accordingly
+    config_sfc_albedo = false                     !default_value="true"
+                                                  ! description="logical for configuration of surface albedo"
+                                                  ! possible_values=".true. for climatologically varying surface albedo MODIS;
+                                                  ! possible_values= .false. for fixed input data TABLE
+    config_sstdiurn_update = false
+    config_deepsoiltemp_update = false
+    config_radtlw_interval = '01:00:00'           !time interval between calls to parameterization of long-wave radiation 'DD_HH:MM:SS' or 'none' (default: 00_00:30:00)
+    config_radtsw_interval = '01:00:00'           !time interval between calls to parameterization of short-wave radiation 'DD_HH:MM:SS' or 'none' (default: 00_00:30:00)
+    config_pbl_interval = 'none'                  !time interval between calls to parameterization of pbl layer (hidden by default) 'DD_HH:MM:SS' or 'none' (default: none)
+    config_conv_interval = 'none'                 !time interval between calls to parameterization of convection (hidden by default) 'DD_HH:MM:SS' or 'none' (default: none)
+    config_camrad_abs_update = '06:00:00'         !time interval between updates of absorption/emission coeffs in CAM rad (hidden by default) 'DD_HH:MM:SS' or 'none' (default: 06:00:00)
+    config_greeness_update = '24:00:00'           !time interval between updates of greeness fraction (hidden by default) 'DD_HH:MM:SS' or 'none' (default: 24:00:00)
+    config_bucket_update = '00:05:00'             !time interval between updates of accumulated rain and radiation diagnostics 'DD_HH:MM:SS' or 'none' (default: none)
+    config_physics_suite = 'mesoscale_reference'  !Choice of physics suite 'mesoscale_reference',
+                                                  !                        'convection_permitting',
+						  !                        'mesoscale_reference_monan'
+						  !                        'convection_permitting_monan'
+						  !                        'none' 
+						  !                        (default:mesoscale_reference)
+    config_microp_scheme = 'suite'                !configuration for cloud microphysics schemes (hidden by default) 
+                                                  !'suite','mp_wsm6','mp_thompson','mp_thompson_aerosols','mp_kessler','off' (default: suite)
+    config_convection_scheme = 'suite'            !configuration for convection schemes (hidden by default) 
+                                                  !'suite','cu_kain_fritsch','cu_tiedtke','cu_ntiedtke','cu_grell_freitas','off' (default: suite)
+    config_radt_cld_scheme = 'suite'              !configuration for calculation of horizontal cloud fraction (hidden by default)
+                                                  !'suite','cld_fraction','cld_incidence' (default: suite)
+    config_radt_lw_scheme = 'suite'               !configuration for long-wave radiation schemes (hidden by default)
+                                                  !'suite','rrtmg_lw','cam_lw','off' (default: suite)
+    config_radt_sw_scheme = 'suite'               !configuration for short-wave radiation schemes (hidden by default)
+                                                  ! 'suite','rrtmg_sw','cam_sw','off' (default: suite)
+    config_lsm_scheme = 'sf_noahmp'                 !configuration for land-surface schemes (hidden by default) 
+                                                  !'suite','sf_noah','sf_noahmp','off' (default: suite)
+    config_gwdo_scheme = 'suite'                  !configuration of gravity wave drag over orography (hidden by default)
+                                                  !'suite','bl_ysu_gwdo','off' (default: suite)
+    config_sfclayer_scheme = 'sf_monin_obukhov_rev'   !configuration for surface layer-scheme (hidden by default)
+                                                  ! 'suite','sf_monin_obukhov','sf_monin_obukhov_rev','sf_mynn','off' (default: suite)
+!==========================================================================================================
+    config_pbl_scheme =  'bl_mynn'                !'suite' !configuration for planetary boundary layer schemes (hidden by default)
+                                                  !'suite','bl_ysu','bl_mynn','off' (default: suite)
+    config_mynn_tkeadvect = false ! do MYNN TKE advection <=> (.true. or .false.)units="-"
+    config_mynn_tkebudget = 0     ! option to add the MYNN TKE budget terms to output 
+                                  !;0)false   
+                                  !;1)true     TKE budget  (Puhales, 2020, WRF 4.2.1) 
+    config_mynn_closure   = 2.5   ! 2.0 level, 2.5 level or 3.0 level for the MYNN TKE turbulence closure units="-"
+    config_mynn_cloudpdf  = 2     ! switch to different cloud PDFs to represent subgrid clouds in the MYNN PBL scheme   
+                                  ! <=>(0,1,2)
+                                  ! (0   )  ORIGINAL MYNN PARTIAL-CONDENSATION SCHEME
+                                  ! (1   )  ALTERNATIVE FORM (Nakanishi & Niino 2004 BLM, eq. B6, and Kuwano-Yoshida et al. 2010 QJRMS, eq. 7):
+                                  ! (2   )  Diagnostic statistical scheme of Chaboureau and Bechtold (2002), JAS
+                                  !         but with use of higher-order moments to estimate sigma
+    config_mynn_mixlength = 2     !mixing length in the MYNN PBL scheme
+                                  !:=0(Nakanishi and Niino 2009)
+                                  !;=1(RAP/HRRR)
+                                  !;=2(Ito et al. 2015)
+    config_mynn_stfunc = 1        !New option for stability function: (Puhales, 2020-12)
+                                  !option to switch flux profile relationship for surface
+                                  !(0: Dyer-Hicks,     (original, Kansas-type function, Paulson, 1970 )
+                                  !(1: Cheng-Brustaert (expanded range, same as used for Jimenez et al (MWR) 
+                                  !    updated stability functions (Puhales, 2020):
+                                  ! see the Technical Note for this implementation (small impact).
+                                  ! Improved conservation of momentum and higher-order moments.
+    config_mynn_topdown = 1       !option to add top-down diffusion driven by cloud-top radiative cooling
+                                  !;0   ===> in_defaults="false"
+                                  !;1   ===> in_defaults="true"
+    config_mynn_scaleaware=1      !option to turn on the scale-aware option
+                                  !0    ===> in_defaults="true
+                                  !1    ===> in_defaults="false
+    config_mynn_dheat_opt = 1     !option to activate heating due to dissipation of TKE
+                                  !0    ===> in_defaults="true"
+                                  !1    ===> in_defaults="false"
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    config_mynn_edmf = 1          ! =1:activate the EDMF option in the MYNN PBL scheme (=0 otherwise)
+                                  !0    ===>  in_defaults="false"
+                                  !1    ===>  in_defaults="true"
+    config_mynn_edmf_output =1    !=0:suppress the allocation of variables needed in the EDMF option of the MYNN PBL scheme"
+                                  !0    ===> in_defaults="false" config_mynn_edmf == config_mynn_edmf_output
+                                  !1    ===> in_defaults="true"  config_mynn_edmf == config_mynn_edmf_output
+    config_mynn_edmf_dd = 1       !=1:activate the EDMF downdraft option in the MYNN PBL scheme (=0 otherwise)
+                                  !0    ===> in_defaults="false" config_mynn_edmf == config_mynn_edmf_dd == config_mynn_edmf_output
+                                  !1    ===> in_defaults="true"  config_mynn_edmf == config_mynn_edmf_dd == config_mynn_edmf_output
+    config_mynn_edmf_mom = 1      !=1:activate momentum transport with the EDMF option of the MYNN PBL scheme(=0 otherwise)
+                                  !0    ===> in_defaults="false"
+                                  !1    ===> in_defaults="true"
+                                  ! REGULATE THE MOMENTUM MIXING FROM THE MASS-FLUX SCHEME (on or off)
+                                  ! Note that s_awu and s_awv already come in as 0.0 if bl_mynn_edmf_mom == .false., so
+                                  ! we only need to zero-out the MF term
+    config_mynn_edmf_tke = 1      !=1:activate TKE transport with the EDMF option of the MYNN PBL scheme (=0 otherwise)
+                                  !0    ===> in_defaults="false"
+                                  !1    ===> in_defaults="true"
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    config_mynn_mixscalars =1     !=1:activate mixing of scalars in the MYNN PBL scheme (=0 otherwise)
+                                  !0    ===> in_defaults="false"
+                                  !1    ===> in_defaults="true"
+    config_mynn_mixclouds = 1     !=1:activate mixing of cloud condensates in the MYNN PBL scheme"
+                                  !0    ===> in_defaults="false"
+                                  !1    ===> in_defaults="true"
+    config_mynn_mixqt = 0         != 0:activate vmixing of moisture species separately;
+                                  != 1:activate  mixing of total water in the mynn PBL scheme"
+!==========================================================================================================
+
+/
+&gf_monan
+    config_gf_pcvol = 0
+    config_gf_cporg = 0
+    config_gf_gustf = 0
+    config_gf_sub3d = 0
+/
+&soundings
+    config_sounding_interval = 'none'
+/
+&physics_lsm_noahmp
+    config_noahmp_iopt_dveg = 4              !option for dynamic vegetation 1 to 6 (default: 4)
+                                             !OptDynamicVeg == 1)  ! no dynamic vegetation, use table LeafAreaIndex use VegFrac = VegFracGreen from input
+                                             !OptDynamicVeg == 3)  ! no dynamic vegetation, use table LeafAreaIndex computed VegFrac from LeafAreaIndex & StemAreaIndex
+                                             !OptDynamicVeg == 4)  ! no dynamic vegetation, use table LeafAreaIndex use yearly maximum vegetation fraction
+                                             !OptDynamicVeg == 7)  ! no dynamic vegetation, use input LeafAreaIndex time series use VegFrac = VegFracGreen from input
+                                             !OptDynamicVeg == 8)  ! no dynamic vegetation, use input LeafAreaIndex time series computed VegFrac from LeafAreaIndex & StemAreaIndex
+                                             !OptDynamicVeg == 9)  ! no dynamic vegetation, use input LeafAreaIndex time series use yearly maximum vegetation fraction
+                                             !OptDynamicVeg == 2)  ! determine if activate dynamic vegetation or crop run computed VegFrac from LeafAreaIndex & StemAreaIndex
+                                             !OptDynamicVeg == 5)  ! determine if activate dynamic vegetation or crop run use yearly maximum vegetation fraction
+                                             !OptDynamicVeg == 6)  ! determine if activate dynamic vegetation or crop run use VegFrac = VegFracGreen from input
+    config_noahmp_iopt_crs = 1               !option for canopy stomatal resistance 0 or 1 (default: 1)
+                                             !canopy stomatal resistance (1-> Ball-Berry; 2->Jarvis)
+    config_noahmp_iopt_btr = 1               !option for soil moisture in stomatal resistance 0 or 1 (default: 1)
+                                             !options for soil moisture factor for stomatal resistance & evapotranspiration
+                                             !soil moisture factor for stomatal resistance (1-> Noah; 2-> CLM; 3-> SSiB)
+    config_noahmp_iopt_runsrf = 6            !option for surface runoff 0 or 1 (default: 3)
+                                             !surface runoff and groundwater (1->SIMGM; 2->SIMTOP; 3->Schaake96; 4->BATS)   
+                                             !! surface runoff and infiltration rate using different schemes
+                                             !if ( OptRunoffSurface == 1 ) call RunoffSurfaceTopModelGrd(noahmp)
+                                             !if ( OptRunoffSurface == 2 ) call RunoffSurfaceTopModelEqui(noahmp)
+                                             !if ( OptRunoffSurface == 3 ) call RunoffSurfaceFreeDrain(noahmp,SoilTimeStep)
+                                             !if ( OptRunoffSurface == 4 ) call RunoffSurfaceBATS(noahmp)
+                                             !if ( OptRunoffSurface == 5 ) call RunoffSurfaceTopModelMMF(noahmp)
+                                             !if ( OptRunoffSurface == 6 ) call RunoffSurfaceVIC(noahmp,SoilTimeStep)
+                                             !if ( OptRunoffSurface == 7 ) call RunoffSurfaceXinAnJiang(noahmp,SoilTimeStep)
+                                             !if ( OptRunoffSurface == 8 ) call RunoffSurfaceDynamicVic(noahmp,SoilTimeStep,InfilSfcAcc)
+    config_noahmp_iopt_runsub = 1            !option for sub-surface option 0 or 1 (default: 3) 
+                                             !subsurface runoff option
+                                             !OptRunoffSubsurface == 1 ! compute groundwater and subsurface runoff
+                                             !                           no DrainSoilBot=0 
+                                             !OptRunoffSubsurface == 2 no DrainSoilBot=0 
+                                             !OptRunoffSubsurface == 3 compute subsurface runoff based on drainage rate
+                                             !                         DrainSoilBot = SoilDrainSlope * SoilWatConductivity(LoopInd)
+                                             !OptRunoffSubsurface == 6 compute subsurface runoff based on drainage rate
+                                             !                         DrainSoilBot = SoilDrainSlope * SoilWatConductivity(LoopInd)
+                                             !OptRunoffSubsurface == 7 compute subsurface runoff based on drainage rate
+                                             !                         DrainSoilBot = SoilDrainSlope * SoilWatConductivity(LoopInd)
+                                             !OptRunoffSubsurface == 8 compute subsurface runoff based on drainage rate
+                                             !                         DrainSoilBot = SoilDrainSlope * SoilWatConductivity(LoopInd)
+                                             !OptRunoffSubsurface == 4 compute subsurface runoff based on drainage rate
+                                             !                         DrainSoilBot = (1.0 - SoilImpervFracMax) * SoilWatConductivity(LoopInd)
+                                             !OptRunoffSubsurface = 5  compute subsurface runoff and shallow water table for MMF
+                                             ! scheme gmm new m-m&f water table dynamics formulation 
+                                             !same liquid fraction as in the bottom layer
+    config_noahmp_iopt_sfc = 1               !option for surface drag 0 or 1 (default: 1)
+                                             !surface layer drag coeff (CH & CM) (1->M-O; 2->Chen97)
+    config_noahmp_iopt_frz = 1               !option for supercooled water 0 or 1 (default: 1)
+                                             !supercooled liquid water (1-> NY06; 2->Koren99)
+    config_noahmp_iopt_inf = 1               !option for frozen soil 0 or 1 (default: 1)
+                                             !frozen soil permeability (1-> NY06; 2->Koren99)
+    config_noahmp_iopt_rad = 3               !option for radiative transfer 0 or 1 (default: 3)
+                                             !radiation transfer (1->gap=F(3D,cosz); 2->gap=0; 3->gap=1-Fveg)
+    config_noahmp_iopt_alb = 1               !option for snow albedo 0 or 1 (default: 1) 
+                                             !snow surface albedo (1->BATS; 2->CLASS)
+    config_noahmp_iopt_snf = 1               !option for pcp partition option 0 or 1 (default: 1)
+                                             !rainfall & snowfall (1-Jordan91; 2->BATS; 3->Noah)
+    config_noahmp_iopt_tksno = 1             !option for snow thermal conductivity 0 or 1 (default: 1)
+                                             !snow thermal conductivity: 
+                                             !  1 -> Stieglitz(yen,1965) scheme (default)
+                                             !, 2 -> Anderson, 1976 scheme
+                                             !, 3 -> constant
+                                             !, 4 -> Verseghy (1991) scheme
+                                             !, 5 -> Douvill(Yen, 1981) scheme
+    config_noahmp_iopt_tbot = 2              !option for lower boundary of soil temperature 0 or 1 (default: 2)
+                                             ! lower boundary of soil temperature (1->zero-flux; 2->Noah)
+    config_noahmp_iopt_stc = 1               !option for soil or snow time scheme 0 or 1 (default: 1)
+                                             ! snow/soil temperature time scheme
+    config_noahmp_iopt_gla = 1               !option for glacier 0 or 1 (default: 1)
+                                             ! glacier option (1->phase change; 2->simple)
+    config_noahmp_iopt_rsf = 4               !option for subrface resistance 0 or 1 (default: 4)
+                                             ! surface resistance option (1->Zeng; 2->simple)
+    config_noahmp_iopt_soil = 1              !option for soil data 0 or 1 (default: 1)
+                                             ! soil configuration option
+    config_noahmp_iopt_pedo = 1              !option for pedo transfer 0 or 1 (default: 1)
+                                             ! soil pedotransfer function option
+    config_noahmp_iopt_crop = 0              !option for crop 0 or 1 (default: 0)
+                                             ! crop model option (0->none; 1->Liu et al.)
+    config_noahmp_iopt_irr = 0               !option for irrigation 0 or 1 (default: 0)
+                                             ! irrigation scheme (0->none; >1 irrigation scheme ON)
+    config_noahmp_iopt_irrm = 0              !option for irrigaton method 0 or 1 (default: 0)
+                                             ! irrigation method (0->dynamic; 1-> sprinkler; 2-> micro; 3-> flood)
+    config_noahmp_iopt_infdv = 1             !option for dvic infiltration 0 or 1 (default: 1)
+                                             ! infiltration options for dynamic VIC (1->Philip; 2-> Green-Ampt;3->Smith-Parlange)
+    config_noahmp_iopt_tdrn = 0              !option for drainage option or 1 (default: 0)
+                                             ! drainage option (0->off; 1->simple scheme; 2->Hooghoudt's scheme)
+/
