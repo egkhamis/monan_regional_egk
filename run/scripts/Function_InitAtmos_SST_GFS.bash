@@ -174,12 +174,12 @@ echo  "STARTING AT \`date\` "
 Start=\`date +%s.%N\`
 echo \$Start >  ${EXPDIR}/Timing.InitAtmosSST
 
-time mpirun -np \$SLURM_NTASKS -env UCX_NET_DEVICES=mlx5_0:1 -genvall ./\${executable}
-
+#time mpirun -np \$SLURM_NTASKS -env UCX_NET_DEVICES=mlx5_0:1 -genvall ./\${executable}
+time mpirun -np \$SLURM_NTASKS  ./\${executable}
 End=\`date +%s.%N\`
 echo  "FINISHED AT \`date\` "
 echo \$End   >> ${EXPDIR}/Timing.InitAtmosSST
-echo \$Start \$End | awk '{print \$2 - \$1" sec"}' >>  ${EXPDIR}/Timing.InitAtmosSST
+echo \$Start \$End | gawk '{print \$2 - \$1" sec"}' >>  ${EXPDIR}/Timing.InitAtmosSST
 
 rm -f SST:*
 

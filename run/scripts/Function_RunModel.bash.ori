@@ -86,20 +86,6 @@ AreaRegion=${9}
 TypeGrid=${10}
 ReStart=${11}
 opt_pnt=${12}
-
-echo "RES_KM=", $RES_KM
-echo "EXP_NAME=", $EXP_NAME
-echo "EXP_RES=", $EXP_RES
-echo "LABELI=", $LABELI
-echo "LABELR=", $LABELR
-echo "LABELW=", $LABELW
-echo "LABELF=", $LABELF
-echo "Domain=", $Domain
-echo "AreaRegion=", $AreaRegion
-echo "TypeGrid=", $TypeGrid
-echo "ReStart=", $ReStart
-echo "opt_pnt=", $opt_pnt
-
 #
 # Caminhos
 #

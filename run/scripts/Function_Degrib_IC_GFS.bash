@@ -69,20 +69,17 @@ NMLDIR=${BASEDIR}/pre/namelist/${version_model}
 EXPDIR=${RUNDIR}/${EXP}
 LOGDIR=${EXPDIR}/logs
 SCRDIR=${SUBMIT_HOME}/run/scripts
-EXECPATH=${SUBMIT_HOME}/pre/exec
+EXECPATH=${SUBMIT_HOME}/pre/exec/${version_model}/exec
 USERDATA=`echo ${EXP} | tr '[:upper:]' '[:lower:]'`
 
 OPERDIR=/oper/dados/ioper/tempo/${EXP}
 BNDDIR=$OPERDIR/0p25/brutos/${LABELI:0:4}/${LABELI:4:2}/${LABELI:6:2}/${LABELI:8:2}
-
+if ! test -d ${BNDDIR}; then
+  echo "directory does not exist."
+BNDDIR=${DATADIR}/global/gfs/${LABELI:0:4}${LABELI:4:2}${LABELI:6:2}${LABELI:8:2}
+fi
 echo $BNDDIR
 
-if [ ! -d ${BNDDIR} ]; then
-   echo "Condicao de contorno inexistente !"
-   echo "Verifique a data da rodada."
-   echo "$0 ${LABELI}"
-   exit 1                     # close for running only the model
-fi
 #
 # Criando diretorio dados Estaticos
 #
@@ -97,6 +94,7 @@ fi
 # tables
 # parameters
 #
+
 if [  -e ${EXPDIR} ]; then
    mkdir -p ${EXPDIR}
    mkdir -p ${EXPDIR}/logs   
@@ -109,10 +107,17 @@ if [ ${Domain} = "regional" ]; then
    echo "----------------------------"  
    echo "       REGIONAL DOMAIN      "  
    echo "----------------------------"  
+   path_reg=${DATADIR}/${Domain}/${USERDATA}/${LABELI}
+
+   if [ ! -d ${path_reg} ]; then
+      echo "Condicao de contorno inexistente !"
+      echo "Verifique a data da rodada."
+      echo "$0 ${path_reg}"
+      exit 1                     # close for running only the model
+   fi
    #
    #
    cd ${EXPDIR}/wpsprd
-   path_reg=${DATADIR}/${Domain}/${USERDATA}/${LABELI}
    mkdir -p ${path_reg}
    if [ ! -e ${path_reg}/gfs.t00z.pgrb2.0p25.f000.${LABELI}.grib2  ]; then
      echo "File ${path_reg}/gfs.t00z.pgrb2.0p25.f000.${LABELI}.grib2 does not exist."
@@ -123,6 +128,17 @@ if [ ${Domain} = "regional" ]; then
      cp -urf ${path_reg}/gfs.t00z.pgrb2.0p25.f000.${LABELI}.grib2 ${EXPDIR}/wpsprd/gfs.t00z.pgrb2.0p25.f000.${LABELI}.grib2
    fi
 else
+   echo "----------------------------"  
+   echo "       GLOBAL  DOMAIN       "  
+   echo "----------------------------"  
+
+   if [ ! -d ${BNDDIR} ]; then
+      echo "Condicao de contorno inexistente !"
+      echo "Verifique a data da rodada."
+      echo "$0 ${BNDDIR}"
+      exit 1                     # close for running only the model
+   fi
+
    cp -urf ${BNDDIR}/gfs.t00z.pgrb2.0p25.f000.${LABELI}.grib2  ${EXPDIR}/wpsprd/gfs.t00z.pgrb2.0p25.f000.${LABELI}.grib2
 fi
 #
@@ -196,7 +212,7 @@ rm -f GRIBFILE.*
 End=\`date +%s.%N\`
 echo  "FINISHED AT \`date\` "
 echo \$End   >>Timing.degrib
-echo \$Start \$End | awk '{print \$2 - \$1" sec"}' >> Timing.degrib
+echo \$Start \$End | gawk '{print \$2 - \$1" sec"}' >> Timing.degrib
 
 grep "Successful completion of program ungrib.exe" ungrib.log >& /dev/null
 
@@ -220,7 +236,7 @@ fi
    rm -f ${EXPDIR}/wpsprd/link_grib.csh
    cd ..
    ln -sf wpsprd/GFS\:${start_date:0:13} FILE3\:${start_date:0:13}
-   find ${EXPDIR}/wpsprd -maxdepth 1 -type l -exec rm -f {} \;
+#   find ${EXPDIR}/wpsprd -maxdepth 1 -type l -exec rm -f {} \;
 
 echo "End of degrib Job"
 
@@ -237,7 +253,13 @@ cp -f /usr/lib64/libjpeg.so* ${HOME}/local/lib64
 
 cd ${DIRMONAN_PRE_SCR}/${LABELI}/pre/runs/${EXP_NAME}//wpsprd/
 
-sbatch --wait ${EXPDIR}/degrib_ic_exe.sh
+echo sbatch --wait ${EXPDIR}/degrib_ic_exe.sh
+
+if [ ${SLURM} = "NO" ]; then
+  ${EXPDIR}/degrib_ic_exe.sh
+else
+  sbatch --wait ${EXPDIR}/degrib_ic_exe.sh
+fi
 
 export start_date=${LABELI:0:4}-${LABELI:4:2}-${LABELI:6:2}_${LABELI:8:2}:00:00
 

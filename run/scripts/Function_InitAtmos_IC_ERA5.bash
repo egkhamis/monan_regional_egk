@@ -62,6 +62,7 @@ fi
 #--- 
 HSTMAQ=$(hostname)
 BASEDIR=${SUBMIT_HOME}
+TBLDIR=${SUBMIT_HOME}/pre/tables
 RUNDIR=${BASEDIR}/${LABELI}/pre/runs
 TBLDIRGRIB=${SUBMIT_HOME}/pre/Variable_Tables
 DIR_MESH=${SUBMIT_HOME}/pre/databcs/meshes/${TypeGrid}/${Domain}/${RES_KM}/
@@ -69,7 +70,7 @@ NMLDIR=${BASEDIR}/pre/namelist/${version_model}
 EXPDIR=${RUNDIR}/${EXP}
 LOGDIR=${EXPDIR}/logs
 SCRDIR=${DIR_HOME}/run/scripts
-EXECPATH=${SUBMIT_HOME}/pre/exec
+EXECPATH=${SUBMIT_HOME}/pre/exec/${version_model}/exec
 USERDATA=`echo ${EXP} | tr '[:upper:]' '[:lower:]'`
 
 OPERDIR=${BASEDIR}/pre/datain/${Domain}/${USERDATA}
@@ -108,6 +109,31 @@ if [  -e ${EXPDIR} ]; then
    mkdir -p ${EXPDIR}/wpsprd
    mkdir -p ${EXPDIR}/scripts
 fi
+
+if [ ${Domain} = "regional" ]; then
+   echo "----------------------------"  
+   echo "       REGIONAL DOMAIN      "  
+   echo "----------------------------"  
+   if [ -e ${EXPDIR}/FILE3:${start_date:0:13}  ]; then
+      echo "File exist."
+   else
+      echo "File not exists"
+      echo "Condicao de contorno inexistente !"
+      echo "Verifique a data da rodada."
+      echo "File does not exist."
+      return 44
+   fi
+else
+   echo "----------------------------"  
+   echo "       GLOBAL  DOMAIN       "  
+   echo "----------------------------"  
+   if [ ! -d ${BNDDIR} ]; then
+      echo "Condicao de contorno inexistente !"
+      echo "Verifique a data da rodada."
+      echo "$0 ${LABELI}"
+      exit 1                     # close for running only the model
+   fi
+fi
 #
 #
 #ln -sf ${BASEDIR}/${LABELI}/pre/runs/${EXP}/static/*.nc .
@@ -131,7 +157,7 @@ cd ${EXPDIR}
 
 JobName=ic_monan
 
-cat > InitAtmos_ic_exe.sh <<EOF0
+cat > ${EXPDIR}/InitAtmos_ic_exe.sh <<EOF0
 #!/bin/bash
 #SBATCH --job-name=${JobName}
 #SBATCH --nodes=${nodes}             # Specify number of nodes
@@ -149,9 +175,12 @@ ulimit -c unlimited
 ulimit -v unlimited
 ulimit -s unlimited
 
-cd ${DIR_HOME}run
+cd ${DIR_HOME}/run
+if [ ${SLURM} = "NO" ]; then
+ echo SLURM=${SLURM}
+else
 . ${DIR_HOME}/run/load_monan_app_modules.sh
-
+fi
 cd ${EXPDIR}
 
 # namelist
@@ -165,31 +194,38 @@ sed -e "s,#RESNPTS#,${EXP_RES},g;s,#x1#,${AreaRegion},g" \
 ln -sf ${DIR_MESH}/${AreaRegion}.${EXP_RES}.graph.info.part.${cores} .
 
 # executable
-
+cp -u ${TBLDIR}/* .
 cp -f ${EXECPATH}/init_atmosphere_model init_atmosphere_model
 rm -f ${AreaRegion}.${EXP_RES}.init.nc
 echo  "STARTING AT \`date\` "
 Start=\`date +%s.%N\`
 echo \$Start >  ${EXPDIR}/Timing.InitAtmos
-
-time mpirun -np \$SLURM_NTASKS -env UCX_NET_DEVICES=mlx5_0:1 -genvall ./\${executable}
+if [ ${SLURM} = "NO" ]; then
+  mpirun -np 4 ./\${executable}
+else
+#  time mpirun -np \$SLURM_NTASKS -env UCX_NET_DEVICES=mlx5_0:1 -genvall ./\${executable}
+  time mpirun -np \$SLURM_NTASKS  ./\${executable}
+fi
 
 End=\`date +%s.%N\`
 echo  "FINISHED AT \`date\` "
 echo \$End   >> ${EXPDIR}/Timing.InitAtmos
-echo \$Start \$End | awk '{print \$2 - \$1" sec"}' >>  ${EXPDIR}/Timing.InitAtmos
+echo \$Start \$End | gawk '{print \$2 - \$1" sec"}' >>  ${EXPDIR}/Timing.InitAtmos
 
 
 date
 exit 0
 EOF0
 
-chmod +x InitAtmos_ic_exe.sh
+chmod +x ${EXPDIR}/InitAtmos_ic_exe.sh
 
 echo -e  "${GREEN}==>${NC} Submiting InitAtmos_ic_exe.sh...\n"
 cd  ${DIRMONAN_PRE_SCR}/${LABELI}/pre/runs/${EXP_NAME}
-
-sbatch --wait InitAtmos_ic_exe.sh
+if [ ${SLURM} = "NO" ]; then
+   ${EXPDIR}/InitAtmos_ic_exe.sh
+else
+   sbatch --wait ${EXPDIR}/InitAtmos_ic_exe.sh
+fi
 
 if [ ! -e ${AreaRegion}.${EXP_RES}.init.nc ]; then
   echo -e  "\n${RED}==>${NC} ***** ATTENTION *****\n"	

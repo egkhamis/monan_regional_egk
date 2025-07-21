@@ -110,7 +110,8 @@ echo $RES_KM
 
 echo -e  "${GREEN}==>${NC} Creating submition scripts degrib, atmosphere_model...\n"
 
-Function_RunModel  ${RES_KM} ${EXP_NAME} ${EXP_RES} ${LABELI} ${LABELF}   ${Domain} ${AreaRegion} ${TypeGrid}
+#Function_RunModel  ${RES_KM} ${EXP_NAME} ${EXP_RES} ${LABELI} ${LABELF}   ${Domain} ${AreaRegion} ${TypeGrid}
+Function_RunModel  ${RES_KM} ${EXP_NAME} ${EXP_RES} ${LABELI} ${LABELF} ${LABELF} ${LABELF}  ${Domain} ${AreaRegion} ${TypeGrid} COLD pnt
 
 
 cd ${SUBMIT_HOME}/${LABELI}/model/runs/${EXP_NAME}

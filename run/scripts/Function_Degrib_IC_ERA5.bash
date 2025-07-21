@@ -69,7 +69,7 @@ NMLDIR=${BASEDIR}/pre/namelist/${version_model}
 EXPDIR=${RUNDIR}/${EXP}
 LOGDIR=${EXPDIR}/logs
 SCRDIR=${SUBMIT_HOME}/run/scripts
-EXECPATH=${SUBMIT_HOME}/pre/exec
+EXECPATH=${SUBMIT_HOME}/pre/exec/${version_model}/exec
 USERDATA=`echo ${EXP} | tr '[:upper:]' '[:lower:]'`
 
 OPERDIR=${BASEDIR}/pre/datain/${Domain}/${USERDATA}
@@ -251,7 +251,7 @@ rm -f GRIBFILE.*
 End=\`date +%s.%N\`
 echo  "FINISHED AT \`date\` "
 echo \$End   >>Timing.degrib
-echo \$Start \$End | awk '{print \$2 - \$1" sec"}' >> Timing.degrib
+echo \$Start \$End | gawk '{print \$2 - \$1" sec"}' >> Timing.degrib
 
 grep "Successful completion of program ungrib.exe" ungrib.log >& /dev/null
 
@@ -275,7 +275,7 @@ fi
    rm -f ${EXPDIR}/wpsprd/link_grib.csh
    cd ..
    ln -sf wpsprd/ERA5\:${start_date:0:13} FILE3\:${start_date:0:13}
-   find ${EXPDIR}/wpsprd -maxdepth 1 -type l -exec rm -f {} \;
+#   find ${EXPDIR}/wpsprd -maxdepth 1 -type l -exec rm -f {} \;
 
 echo "End of degrib Job"
 
@@ -293,7 +293,11 @@ cp -f /usr/lib64/libjpeg.so* ${HOME}/local/lib64
 
 cd ${DIRMONAN_PRE_SCR}/${LABELI}/pre/runs/${EXP_NAME}//wpsprd/
 
-sbatch --wait ${EXPDIR}/degrib_ic_exe.sh
+if [ ${SLURM} = "NO" ]; then
+  ${EXPDIR}/degrib_ic_exe.sh
+else
+  sbatch --wait ${EXPDIR}/degrib_ic_exe.sh
+fi
 
 export start_date=${LABELI:0:4}-${LABELI:4:2}-${LABELI:6:2}_${LABELI:8:2}:00:00
 

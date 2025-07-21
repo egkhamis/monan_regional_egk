@@ -48,16 +48,17 @@ TypeGrid=${6}
 
 if [ ${TypeGrid} = 'variable_resolution' ]; then
 path_exe=${SUBMIT_HOME}"/pre/databcs/meshes/"${TypeGrid}
+path_grid=${SUBMIT_HOME}/pre/databcs/meshes/${TypeGrid}/
 path_rec=${SUBMIT_HOME}"/pre/databcs/meshes/regional_domain/"
-path_bin=${SUBMIT_HOME}"/pre/sources/MPAS-Tools/MPAS-Limited-Area/"
+path_bin=${SUBMIT_HOME}"/pre/sources/${USER_COMPILER}/MPAS-Tools/MPAS-Limited-Area/"
 path_in=${path_exe}
 path_out=${path_exe}
-input_filename=${path_exe}/global/${RES_KM}/x${frac}.${EXP_RES}.grid.nc
+input_filename=${path_exe}/global/${RES_KM/}/x${frac}.${EXP_RES}.grid.nc
 output_filename=${path_exe}/global/${RES_KM}/g${frac}.${EXP_RES}.grid.nc
 
 cd ${path_exe}
-clon=`cat ${path_rec}/${AreaRegion}.ellipse.pts | grep Point: | awk '{printf "%.5f\n", $3/1}'`
-clat=`cat ${path_rec}/${AreaRegion}.ellipse.pts | grep Point: | awk '{printf "%.5f\n", $2/1}'`
+clon=`cat ${path_rec}/${AreaRegion}.ellipse.pts | grep Point: | gawk '{printf "%.5f\n", $3/1}'`
+clat=`cat ${path_rec}/${AreaRegion}.ellipse.pts | grep Point: | gawk '{printf "%.5f\n", $2/1}'`
 
 cat<<EOF>${path_exe}/namelist.input
 &input
@@ -88,22 +89,30 @@ mkdir -p regional/${RES_KM}/
 mv ${AreaRegion}.graph.info  regional/${RES_KM}/${AreaRegion}.${EXP_RES}.graph.info
 mv ${AreaRegion}.grid.nc     regional/${RES_KM}/${AreaRegion}.${EXP_RES}.grid.nc
 
-path_mets=/mnt/beegfs/paulo.kubota/monan_project/metis-5.1.0/build/Linux-x86_64/programs
+#path_mets=/mnt/beegfs/paulo.kubota/monan_project/metis-5.1.0/build/Linux-x86_64/programs
+#path_mets=/opt/ohpc/pub/libs/gnu9/metis/5.1.0/bin/gpmetis
+path_mets=/mnt/beegfs/eduardo.khamis/issues/714/metis-5.1.0/build/Linux-x86_64/programs
 ${path_mets}/gpmetis     -minconn     -contig    -niter=1000    regional/${RES_KM}/${AreaRegion}.${EXP_RES}.graph.info    128
 ${path_mets}/gpmetis     -minconn     -contig    -niter=1000    regional/${RES_KM}/${AreaRegion}.${EXP_RES}.graph.info    32
+${path_mets}/gpmetis     -minconn     -contig    -niter=1000    regional/${RES_KM}/${AreaRegion}.${EXP_RES}.graph.info    64
 ${path_mets}/gpmetis     -minconn     -contig    -niter=1000    regional/${RES_KM}/${AreaRegion}.${EXP_RES}.graph.info    256
 ${path_mets}/gpmetis     -minconn     -contig    -niter=1000    regional/${RES_KM}/${AreaRegion}.${EXP_RES}.graph.info    512
+ln -s  ${path_grid}/regional/${RES_KM}/${AreaRegion}.${EXP_RES}.graph.info   regional/${RES_KM}/${AreaRegion}.${EXP_RES}.graph.info.part.1
+
 else
 
 ln global/${RES_KM}/x${frac}.${EXP_RES}.graph.info   global/${RES_KM}/${AreaRegion}.${EXP_RES}.graph.info
 ln global/${RES_KM}/g${frac}.${EXP_RES}.grid.nc      global/${RES_KM}/${AreaRegion}.${EXP_RES}.grid.nc
 
-path_mets=/mnt/beegfs/paulo.kubota/monan_project/metis-5.1.0/build/Linux-x86_64/programs
+#path_mets=/mnt/beegfs/paulo.kubota/monan_project/metis-5.1.0/build/Linux-x86_64/programs
+#path_mets=/opt/ohpc/pub/libs/gnu9/metis/5.1.0/bin
+path_mets=/mnt/beegfs/eduardo.khamis/issues/714/metis-5.1.0/build/Linux-x86_64/programs
 ${path_mets}/gpmetis     -minconn     -contig    -niter=1000    global/${RES_KM}/${AreaRegion}.${EXP_RES}.graph.info    128
 ${path_mets}/gpmetis     -minconn     -contig    -niter=1000    global/${RES_KM}/${AreaRegion}.${EXP_RES}.graph.info    32
+${path_mets}/gpmetis     -minconn     -contig    -niter=1000    global/${RES_KM}/${AreaRegion}.${EXP_RES}.graph.info    64
 ${path_mets}/gpmetis     -minconn     -contig    -niter=1000    global/${RES_KM}/${AreaRegion}.${EXP_RES}.graph.info    256
 ${path_mets}/gpmetis     -minconn     -contig    -niter=1000    global/${RES_KM}/${AreaRegion}.${EXP_RES}.graph.info    512
-
+ln -s  ${path_grid}/global/${RES_KM}/${AreaRegion}.${EXP_RES}.graph.info     global/${RES_KM}/${AreaRegion}.${EXP_RES}.graph.info.part.1
 echo "----------------------------"  
 echo "        GLOBAL DOMAIN       "  
 echo "----------------------------"  

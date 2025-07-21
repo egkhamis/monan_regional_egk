@@ -69,7 +69,7 @@ NMLDIR=${BASEDIR}/pre/namelist/${version_model}
 EXPDIR=${RUNDIR}/${EXP}
 LOGDIR=${EXPDIR}/logs
 SCRDIR=${SUBMIT_HOME}/run/scripts
-EXECPATH=${SUBMIT_HOME}/pre/exec
+EXECPATH=${SUBMIT_HOME}/pre/exec/${version_model}/exec/
 USERDATA=`echo ${EXP} | tr '[:upper:]' '[:lower:]'`
 
 OPERDIR=/oper/dados/ioper/tempo/${EXP}
@@ -154,7 +154,12 @@ ulimit -v unlimited
 ulimit -s unlimited
 
 cd ${DIR_HOME}/run
+if [ ${SLURM} = "NO" ]; then
+ echo SLURM=${SLURM}
+else
 . ${DIR_HOME}/run/load_monan_app_modules.sh
+fi
+
 
 cd ${EXPDIR}
 
@@ -177,12 +182,18 @@ echo  "STARTING AT \`date\` "
 Start=\`date +%s.%N\`
 echo \$Start >  ${EXPDIR}/Timing.InitAtmos
 
-time mpirun -np \$SLURM_NTASKS -env UCX_NET_DEVICES=mlx5_0:1 -genvall ./\${executable}
+if [ ${SLURM} = "NO" ]; then
+  mpirun -np 4 ./\${executable}
+else
+  #time mpirun -np \$SLURM_NTASKS -env UCX_NET_DEVICES=mlx5_0:1 -genvall ./\${executable}
+  time mpirun -np \$SLURM_NTASKS  ./\${executable}
+fi
+
 
 End=\`date +%s.%N\`
 echo  "FINISHED AT \`date\` "
 echo \$End   >> ${EXPDIR}/Timing.InitAtmos
-echo \$Start \$End | awk '{print \$2 - \$1" sec"}' >>  ${EXPDIR}/Timing.InitAtmos
+echo \$Start \$End | gawk '{print \$2 - \$1" sec"}' >>  ${EXPDIR}/Timing.InitAtmos
 
 rm -f ${EXPDIR}/ER5\:* 
 
@@ -195,7 +206,12 @@ chmod +x ${EXPDIR}/InitAtmos_lbc_exe.sh
 echo -e  "${GREEN}==>${NC} Submiting InitAtmos_lbc_exe.sh...\n"
 cd  ${DIRMONAN_PRE_SCR}/${LABELI}/pre/runs/${EXP_NAME}
 
-sbatch --wait ${EXPDIR}/InitAtmos_lbc_exe.sh
+if [ ${SLURM} = "NO" ]; then
+   ${EXPDIR}/InitAtmos_lbc_exe.sh
+else
+   sbatch --wait ${EXPDIR}/InitAtmos_lbc_exe.sh
+fi
+
 echo -e  "${GREEN}==>${NC} Script ${0} completed. \n"
 
 

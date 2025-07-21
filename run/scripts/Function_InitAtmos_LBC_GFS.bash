@@ -63,17 +63,19 @@ fi
 HSTMAQ=$(hostname)
 BASEDIR=${SUBMIT_HOME}
 RUNDIR=${BASEDIR}/${LABELI}/pre/runs
+DATADIR=${BASEDIR}/pre/datain/
 TBLDIRGRIB=${SUBMIT_HOME}/pre/Variable_Tables
 DIR_MESH=${SUBMIT_HOME}/pre/databcs/meshes/${TypeGrid}/${Domain}/${RES_KM}/
 NMLDIR=${BASEDIR}/pre/namelist/${version_model}
 EXPDIR=${RUNDIR}/${EXP}
 LOGDIR=${EXPDIR}/logs
 SCRDIR=${SUBMIT_HOME}/run/scripts
-EXECPATH=${SUBMIT_HOME}/pre/exec
+EXECPATH=${SUBMIT_HOME}/pre/exec/${version_model}/exec
 USERDATA=${EXP}
 
 OPERDIR=/oper/dados/ioper/tempo/${EXP}
 BNDDIR=$OPERDIR/0p25/brutos/${LABELI:0:4}/${LABELI:4:2}/${LABELI:6:2}/${LABELI:8:2}
+BNDDIR=${DATADIR}/global/gfs/${LABELI:0:4}${LABELI:4:2}${LABELI:6:2}${LABELI:8:2}
 
 echo $BNDDIR
 if [ ${Domain} = "global" ]; then
@@ -83,11 +85,20 @@ if [ ${Domain} = "global" ]; then
     echo "nothing to do here"
     return 66
 fi
-if [ ! -d ${BNDDIR} ]; then
-   echo "Condicao de contorno inexistente !"
-   echo "Verifique a data da rodada."
-   echo "$0 ${LABELI}"
-   exit 1                     # close for running only the model
+
+if [ ${Domain} = "regional" ]; then
+   echo "----------------------------"  
+   echo "       REGIONAL DOMAIN      "  
+   echo "----------------------------"  
+   if [ -e ${EXPDIR}/GFS:${start_date:0:13}  ]; then
+      echo "File exist."
+   else
+      echo "File not exists"
+      echo "Condicao de contorno inexistente !"
+      echo "Verifique a data da rodada."
+      echo "File does not exist."
+      return 44
+   fi
 fi
 #
 # selected ncores to submission job
@@ -152,7 +163,12 @@ ulimit -v unlimited
 ulimit -s unlimited
 
 cd ${DIR_HOME}/run
+if [ ${SLURM} = "NO" ]; then
+echo   ${EXPDIR}/InitAtmos_ic_exe.sh
+else
 . ${DIR_HOME}/run/load_monan_app_modules.sh
+
+fi
 
 cd ${EXPDIR}
 
@@ -175,12 +191,17 @@ echo  "STARTING AT \`date\` "
 Start=\`date +%s.%N\`
 echo \$Start >  ${EXPDIR}/Timing.InitAtmos
 
-time mpirun -np \$SLURM_NTASKS -env UCX_NET_DEVICES=mlx5_0:1 -genvall ./\${executable}
+if [ ${SLURM} = "NO" ]; then
+  mpirun -np 4 ./\${executable}
+else
+#  time mpirun -np \$SLURM_NTASKS -env UCX_NET_DEVICES=mlx5_0:1 -genvall ./\${executable}
+  time mpirun -np \$SLURM_NTASKS ./\${executable}
+fi
 
 End=\`date +%s.%N\`
 echo  "FINISHED AT \`date\` "
 echo \$End   >> ${EXPDIR}/Timing.InitAtmos
-echo \$Start \$End | awk '{print \$2 - \$1" sec"}' >>  ${EXPDIR}/Timing.InitAtmos
+echo \$Start \$End | gawk '{print \$2 - \$1" sec"}' >>  ${EXPDIR}/Timing.InitAtmos
 
 rm -f ${EXPDIR}/GFS\:* 
 
@@ -193,7 +214,13 @@ chmod +x ${EXPDIR}/InitAtmos_lbc_exe.sh
 echo -e  "${GREEN}==>${NC} Submiting InitAtmos_lbc_exe.sh...\n"
 cd  ${DIRMONAN_PRE_SCR}/${LABELI}/pre/runs/${EXP_NAME}
 
+echo sbatch --wait ${EXPDIR}/InitAtmos_lbc_exe.sh
+
+if [ ${SLURM} = "NO" ]; then
+${EXPDIR}/InitAtmos_lbc_exe.sh
+else
 sbatch --wait ${EXPDIR}/InitAtmos_lbc_exe.sh
+fi
 echo -e  "${GREEN}==>${NC} Script ${0} completed. \n"
 
 

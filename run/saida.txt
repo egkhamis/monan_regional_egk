@@ -1,0 +1,33 @@
+export Environmental Variable
+set resolution
+[1;32m==>[0m Creating Function_GridRotate.sh for...
+
+-------------------------------------
+       RESOLUTION QUASI_UNIFORM      
+-------------------------------------
+[1;32m==>[0m Creating Function_RecDomain.sh for...
+
+----------------------------
+       REGIONAL DOMAIN      
+----------------------------
+ERROR: Mesh file was not found global/120_km/x1.40962.grid.nc
+ERROR: Mesh file was not found global/120_km/x1.40962.static.nc
+[1;32m==>[0m Plot Domain.sh for...
+
+----------------------------
+       REGIONAL DOMAIN      
+----------------------------
+[1;32m==>[0m Creating make_static.sh for submiting init_atmosphere...
+
+set Function_SetClusterConfig
+File does not exist.
+[1;32m==>[0m Executing sbatch make_static.sh...
+
+sbatch --wait /mnt/beegfs/eduardo.khamis/issues/714/monan_oper/monan/2025050100/pre/runs/GFS/static/make_static.sh
+Submitted batch job 493488
+File does not exist.
+
+[1;31m==>[0m ***** ATTENTION *****
+
+[1;31m==>[0m Static phase fails ! Check logs at /mnt/beegfs/eduardo.khamis/issues/714/monan_oper/monan/2025050100/pre/runs/GFS/static/logs . Exiting script. 
+

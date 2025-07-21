@@ -63,7 +63,7 @@ TBLDIR=${BASEDIR}/pre/tables
 NMLDIR=${BASEDIR}/pre/namelist/${version_model}
 MESHDIR=${BASEDIR}/pre/databcs/meshes/${TypeGrid}/${Domain}/${RES_KM}
 GEODATA=${BASEDIR}/pre/databcs/WPS_GEOG/
-EXECFILEPATH=${SUBMIT_HOME}/pre/exec
+EXECFILEPATH=${SUBMIT_HOME}/pre/exec/${version_model}/exec
 SCRIPTFILEPATH=${BASEDIR}/${LABELI}/pre/runs
 STATICPATH=${SCRIPTFILEPATH}/${EXP}/static
 #
@@ -83,6 +83,16 @@ fi
 if [ ! -d ${STATICPATH} ]; then
   mkdir -p ${STATICPATH}/logs
 fi
+
+
+if [ -e ${MESHDIR}/${AreaRegion}.${RES}.static.nc  ]; then
+  echo "File  exist."
+  cd ${STATICPATH}
+  cp  -pf ${MESHDIR}/${AreaRegion}.${RES}.grid.nc .
+  cp  -pf ${MESHDIR}/${AreaRegion}.${RES}.static.nc .
+  return 104
+fi
+
 
 cd ${STATICPATH}
 
@@ -133,12 +143,16 @@ Start=\`date +%s.%N\`
 echo \$Start > ${STATICPATH}/Timing
 
 date
-time mpirun -np \$SLURM_NTASKS -env UCX_NET_DEVICES=mlx5_0:1 -genvall ./\${executable}
-
+if [ ${SLURM} = "NO" ]; then
+   mpirun -np ${cores_stat}  ./\${executable}
+else
+  #time mpirun -np \$SLURM_NTASKS -env UCX_NET_DEVICES=mlx5_0:1 -genvall ./\${executable}
+  time mpirun -np ${cores_stat} ./\${executable}
+fi
 End=\`date +%s.%N\`
 echo  "FINISHED AT \`date\` "
 echo \$End   >> ${STATICPATH}/Timing
-echo \$Start \$End | awk '{print \$2 - \$1" sec"}' >> ${STATICPATH}/Timing
+echo \$Start \$End | gawk '{print \$2 - \$1" sec"}' >> ${STATICPATH}/Timing
 
 grep "Finished running" log.init_atmosphere.0000.out >& /dev/null
 
@@ -174,9 +188,13 @@ echo -e  "${GREEN}==>${NC} Executing sbatch make_static.sh...\n"
 
 cd ${STATICPATH}
 
-echo sbatch --wait ${STATICPATH}/make_static.sh
-
-sbatch --wait ${STATICPATH}/make_static.sh
+if [ ${SLURM} = "NO" ]; then
+   echo  ${STATICPATH}/make_static.sh
+   ${STATICPATH}/make_static.sh
+else
+   echo sbatch --wait ${STATICPATH}/make_static.sh
+   sbatch --wait ${STATICPATH}/make_static.sh
+fi
 
 if [ ! -e ${STATICPATH}/${AreaRegion}.${EXP_RES}.static.nc  ]; then
     echo "File does not exist."

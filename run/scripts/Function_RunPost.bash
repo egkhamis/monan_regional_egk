@@ -28,7 +28,7 @@ Function_RunPost() {
 # For ERA5 datasets
 #
 #        ./Function_RunPost.bash ERA5 ${EXP_RES} 2021010100
-#        ./Function_RunPost  ${RES_KM} ${EXP_NAME} ${EXP_RES} ${LABELI} ${LABELF}  ${Domain} ${AreaRegion} ${TypeGrid}
+#        ./Function_RunPost  ${RES_KM} ${EXP_NAME} ${EXP_RES} ${LABELI} ${LABELF}  ${Domain} ${AreaRegion} ${TypeGrid} ${opt_pnt}
 #           o RES_KM     : 060_015km
 #           o EXP_NAME   : GFS, ERA5
 #           o EXP_RES    : mesh npts : 535554 etc
@@ -37,6 +37,7 @@ Function_RunPost() {
 #           o Domain     : Domain: global or regional
 #           o AreaRegion : PortoAlegre, Belem, global
 #           o TypeGrid   : quasi_uniform or variable_resolution
+#           o opt_pnt    : restart optios "pnt" or clm
 #
 #
 # !REVISION HISTORY:
@@ -58,7 +59,7 @@ function usage(){
 # Verificando argumentos de entrada
 #
 
-if [ $# -ne 8 ]; then
+if [ $# -ne 9 ]; then
    usage
    exit 1
 fi
@@ -75,6 +76,7 @@ LABELF=${5};end_date=${LABELF:0:4}-${LABELF:4:2}-${LABELF:6:2}_${LABELF:8:2}:00:
 Domain=${6}
 AreaRegion=${7}
 TypeGrid=${8}
+opt_pnt=${9}
 
 if [ ${Domain} = "regional" ]; then
 echo "----------------------------"  
@@ -84,32 +86,32 @@ DOM=R
 export DIR_MESH=${SUBMIT_HOME}/pre/databcs/meshes/regional_domain/
 
 
-clon=`cat ${DIR_MESH}/${AreaRegion}.ellipse.pts | grep Point: | awk '{printf "%.5f\n", $3/1}'`
-clat=`cat ${DIR_MESH}/${AreaRegion}.ellipse.pts | grep Point: | awk '{printf "%.5f\n", $2/1}'`
+clon=`cat ${DIR_MESH}/${AreaRegion}.ellipse.pts | grep Point: | gawk '{printf "%.5f\n", $3/1}'`
+clat=`cat ${DIR_MESH}/${AreaRegion}.ellipse.pts | grep Point: | gawk '{printf "%.5f\n", $2/1}'`
 #
 #   1grau -  110000
 #   y     - 1000000.   
 #
-Semi_major_axis=`cat ${DIR_MESH}/${AreaRegion}.ellipse.pts | grep Semi-major-axis: | awk '{printf "%.5f\n", (($2/1)/100000)+2}'`
-startlon=`echo ${clon}  ${Semi_major_axis}| awk '{printf "%.5f\n", $1-(($2/2)+7)} '`   # -64.0
-endlon=`echo   ${clon}  ${Semi_major_axis}| awk '{printf "%.5f\n", $1+(($2/2)+7)} '`   # -39.0
-startlat=`echo ${clat}  ${Semi_major_axis}| awk '{printf "%.5f\n", $1-(($2/2)+7)} '`   # -40.0
-endlat=`echo ${clat}    ${Semi_major_axis}| awk '{printf "%.5f\n", $1+(($2/2)+7)} '`   # -20.0
-nlat=`echo ${startlat}  ${endlat} ${len_disp}| awk '{printf "%d\n", sqrt(((($2-$1+1)*110000)/$3)^2) } '`    # 700
-nlon=`echo ${startlon}  ${endlon} ${len_disp}| awk '{printf "%d\n", sqrt(((($2-$1+1)*110000)/$3)^2) } '`    #  867
+Semi_major_axis=`cat ${DIR_MESH}/${AreaRegion}.ellipse.pts | grep Semi-major-axis: | gawk '{printf "%.5f\n", (($2/1)/100000)+2}'`
+startlon=`echo ${clon}  ${Semi_major_axis}| gawk '{printf "%.5f\n", $1-(($2/2)+7)} '`   # -64.0
+endlon=`echo   ${clon}  ${Semi_major_axis}| gawk '{printf "%.5f\n", $1+(($2/2)+7)} '`   # -39.0
+startlat=`echo ${clat}  ${Semi_major_axis}| gawk '{printf "%.5f\n", $1-(($2/2)+7)} '`   # -40.0
+endlat=`echo ${clat}    ${Semi_major_axis}| gawk '{printf "%.5f\n", $1+(($2/2)+7)} '`   # -20.0
+nlat=`echo ${startlat}  ${endlat} ${len_disp}| gawk '{printf "%d\n", sqrt(((($2-$1+1)*110000)/$3)^2) } '`    # 700
+nlon=`echo ${startlon}  ${endlon} ${len_disp}| gawk '{printf "%d\n", sqrt(((($2-$1+1)*110000)/$3)^2) } '`    #  867
 
 else
 echo "----------------------------"  
 echo "        GLOBAL DOMAIN       "  
 echo "----------------------------"  
 DOM=G
-#Semi_major_axis=`cat ${DIR_MESH}/${AreaRegion}.ellipse.pts | grep Semi-major-axis: | awk '{printf "%.5f\n", (($2/1)/100000)+2}'`
-startlon=0.2496533   #`echo ${clon}  ${Semi_major_axis}| awk '{printf "%.5f\n", $1-(($2/2)+7)} '`   # -64.0
-endlon=359.7503   #`echo   ${clon}  ${Semi_major_axis}| awk '{printf "%.5f\n", $1+(($2/2)+7)} '`   # -39.0
-startlat=-89.75 #`echo ${clat}  ${Semi_major_axis}| awk '{printf "%.5f\n", $1-(($2/2)+7)} '`   # -40.0
-endlat=89.75    #`echo ${clat}    ${Semi_major_axis}| awk '{printf "%.5f\n", $1+(($2/2)+7)} '`   # -20.0
-nlat=360 #`echo ${startlat}  ${endlat} ${len_disp}| awk '{printf "%d\n", sqrt(((($2-$1+1)*110000)/$3)^2) } '`    # 700
-nlon=721 #`echo ${startlon}  ${endlon} ${len_disp}| awk '{printf "%d\n", sqrt(((($2-$1+1)*110000)/$3)^2) } '`    #  867
+#Semi_major_axis=`cat ${DIR_MESH}/${AreaRegion}.ellipse.pts | grep Semi-major-axis: | gawk '{printf "%.5f\n", (($2/1)/100000)+2}'`
+startlon=0.2496533   #`echo ${clon}  ${Semi_major_axis}| gawk '{printf "%.5f\n", $1-(($2/2)+7)} '`   # -64.0
+endlon=359.7503   #`echo   ${clon}  ${Semi_major_axis}| gawk '{printf "%.5f\n", $1+(($2/2)+7)} '`   # -39.0
+startlat=-89.75 #`echo ${clat}  ${Semi_major_axis}| gawk '{printf "%.5f\n", $1-(($2/2)+7)} '`   # -40.0
+endlat=89.75    #`echo ${clat}    ${Semi_major_axis}| gawk '{printf "%.5f\n", $1+(($2/2)+7)} '`   # -20.0
+nlat=360 #`echo ${startlat}  ${endlat} ${len_disp}| gawk '{printf "%d\n", sqrt(((($2-$1+1)*110000)/$3)^2) } '`    # 700
+nlon=721 #`echo ${startlon}  ${endlon} ${len_disp}| gawk '{printf "%d\n", sqrt(((($2-$1+1)*110000)/$3)^2) } '`    #  867
 fi
 
 mkdir -p ${SUBMIT_HOME}/${LABELI}/pos/runs/${EXP_NAME}/postprd/logs
@@ -132,7 +134,7 @@ rm -f ${LOG_FILE}
 # copy convert_mpas from MONAN/exec to testcase
 cd ${SUBMIT_HOME}/${LABELI}/pos/runs/${EXP_NAME}/postprd
 rm -f ${SUBMIT_HOME}/${LABELI}/pos/runs/${EXP_NAME}/postprd/convert_mpas >> ${LOG_FILE}
-cp ${DIR_HOME}/pos/exec/${version_pos}/exec/convert_mpas ${SUBMIT_HOME}/${LABELI}/pos/runs/${EXP_NAME}/postprd/ >> ${LOG_FILE}
+cp ${SUBMIT_HOME}/pos/exec/${version_pos}/exec/convert_mpas ${SUBMIT_HOME}/${LABELI}/pos/runs/${EXP_NAME}/postprd/ >> ${LOG_FILE}
 
 cp -u ${SUBMIT_HOME}/${LABELI}/model/runs/${EXP_NAME}/${AreaRegion}.${EXP_RES}.init.nc        ${SUBMIT_HOME}/${LABELI}/model/runs/${EXP_NAME}/monanprd/ >> ${LOG_FILE}
 # copy from repository to testcase and runs /ngrid2latlon.sh
@@ -146,10 +148,11 @@ cd ${SUBMIT_HOME}/${LABELI}/pos/runs/${EXP_NAME}/postprd/
 # scripts
 #
 JobName=post_monan
+JobName=PO${LABELF:0:4}${LABELF:4:2}        # Nome do Job
 #
 #
 
-cat > post_convert.sh << EOF0
+cat > ${SUBMIT_HOME}/${LABELI}/pos/runs/${EXP_NAME}/postprd/post_convert.sh << EOF0
 #!/bin/bash
 #SBATCH --job-name=${JobName}
 #SBATCH --nodes=1
@@ -170,24 +173,24 @@ echo  "STARTING AT \`date\` "
 cd ${SUBMIT_HOME}/${LABELI}/pos/runs/${EXP_NAME}/postprd/ 
 
 search_dir=${SUBMIT_HOME}/${LABELI}/model/runs/${EXP_NAME}/monanprd
-for files in "\$search_dir"/diag.*
+for files in "\$search_dir"/diag.*.nc
 do
 
 dirpost=`pwd`
 dirmodel=\`dirname \${files}\`
 filename=\`basename \${files}\`
 if [ \${filename:0:4} = "diag" ]; then
-labelF=\`echo \${filename} | awk '{print substr(\$1,6,22)}'\`
-cp ${SUBMIT_HOME}/pos/namelist/${version_pos}/include_fields.diag      ${SUBMIT_HOME}/${LABELI}/pos/runs/${EXP_NAME}/postprd/include_fields   >> ${LOG_FILE}
-cp ${SUBMIT_HOME}/pos/namelist/${version_pos}/exclude_fields.diag      ${SUBMIT_HOME}/${LABELI}/pos/runs/${EXP_NAME}/postprd/exclude_fields   >> ${LOG_FILE}
+labelF=\`echo \${filename} | gawk '{print substr(\$1,6,22)}'\`
+cp ${SUBMIT_HOME}/pos/namelist/${version_pos}/include_fields.diag.${opt_pnt}      ${SUBMIT_HOME}/${LABELI}/pos/runs/${EXP_NAME}/postprd/include_fields   >> ${LOG_FILE}
+cp ${SUBMIT_HOME}/pos/namelist/${version_pos}/exclude_fields.diag.${opt_pnt}      ${SUBMIT_HOME}/${LABELI}/pos/runs/${EXP_NAME}/postprd/exclude_fields   >> ${LOG_FILE}
 
 labelC=\${labelF:0:4}\${labelF:5:2}\${labelF:8:2}\${labelF:11:2}
 postname='MONAN_DIAG_'${DOM}'_POS_'${EXP_NAME}'_'${LABELI}'_'\${labelC}'.mm.x'${frac}'.'${EXP_RES}'L55.nc'
 
 else
-labelF=\`echo \${filename} | awk '{print substr(\$1,9,22)}'\`
-cp ${SUBMIT_HOME}/pos/namelist/${version_pos}/include_fields.history      ${SUBMIT_HOME}/${LABELI}/pos/runs/${EXP_NAME}/postprd/include_fields   >> ${LOG_FILE}
-cp ${SUBMIT_HOME}/pos/namelist/${version_pos}/exclude_fields.history      ${SUBMIT_HOME}/${LABELI}/pos/runs/${EXP_NAME}/postprd/exclude_fields   >> ${LOG_FILE}
+labelF=\`echo \${filename} | gawk '{print substr(\$1,9,22)}'\`
+cp ${SUBMIT_HOME}/pos/namelist/${version_pos}/include_fields.history.${opt_pnt}      ${SUBMIT_HOME}/${LABELI}/pos/runs/${EXP_NAME}/postprd/include_fields   >> ${LOG_FILE}
+cp ${SUBMIT_HOME}/pos/namelist/${version_pos}/exclude_fields.history.${opt_pnt}      ${SUBMIT_HOME}/${LABELI}/pos/runs/${EXP_NAME}/postprd/exclude_fields   >> ${LOG_FILE}
 
 labelC=\${labelF:0:4}\${labelF:5:2}\${labelF:7:2}\${labelF:9:2}
 postname='MONAN_HIST_'${DOM}'_POS_'${EXP_NAME}'_'${LABELI}'_'\${labelC}'.mm.x'${frac}'.'${EXP_RES}'L55.nc'
@@ -200,6 +203,9 @@ rm latlon.nc
 mv latlon.nc  \${postname}
 done
 
+mv ${SUBMIT_HOME}/${LABELI}/model/runs/${EXP_NAME}/monanprd  ${SUBMIT_HOME}/${LABELI}/model/runs/${EXP_NAME}/monanprd_${LABELI}_${LABELF} 
+mkdir -p ${SUBMIT_HOME}/${LABELI}/model/runs/${EXP_NAME}/monanprd
+
 echo "End of degrib Job"
 
 exit 0
@@ -210,11 +216,17 @@ chmod 777 post_convert.sh
 cd ${SUBMIT_HOME}/${LABELI}/pos/runs/${EXP_NAME}/postprd/ 
 
 
-sbatch --wait post_convert.sh
+echo sbatch --wait post_convert.sh
 
-echo Function_Create_ctl ${EXP_NAME} ${EXP_RES}  ${LABELI} ${Domain} ${AreaRegion} ${len_disp}
+if [ ${SLURM} = "NO" ]; then
+   ${SUBMIT_HOME}/${LABELI}/pos/runs/${EXP_NAME}/postprd/post_convert.sh
+else
+   sbatch --wait ${SUBMIT_HOME}/${LABELI}/pos/runs/${EXP_NAME}/postprd/post_convert.sh
+fi
 
-Function_Create_ctl ${EXP_NAME} ${EXP_RES}  ${LABELI} ${Domain} ${AreaRegion} ${len_disp}
+echo Function_Create_ctl.${opt_pnt} ${EXP_NAME} ${EXP_RES}  ${LABELI} ${Domain} ${AreaRegion} ${len_disp}
+
+Function_Create_ctl.${opt_pnt} ${EXP_NAME} ${EXP_RES}  ${LABELI} ${Domain} ${AreaRegion} ${len_disp}
 
 echo -e  "${GREEN}==>${NC}  Script ${0} completed. \n"
 echo -e  "${GREEN}==>${NC}  Log file: ${LOG_FILE} . End of script. \n"

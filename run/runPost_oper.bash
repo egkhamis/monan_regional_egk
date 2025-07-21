@@ -13,12 +13,12 @@
 #
 # !CALLING SEQUENCE:
 #     
-#   ./runPost.bash  ${EXP_NAME} ${EXP_RES}   ${LABELI}  ${LABELF}  ${Domain}  ${AreaRegion}  ${TypeGrid}
+#   ./runPost.bash  ${EXP_NAME} ${EXP_RES}   ${LABELI}  ${LABELF}  ${Domain}  ${AreaRegion}  ${TypeGrid} ${opt_pnt}
 #
 #
 # For GFS datasets
 #
-#        ./runPost.bash  GFS 535554   2024042700  2024050100  regional  PortoAlegre  variable_resolution
+#        ./runPost.bash  GFS 535554   2024042700  2024050100  regional  PortoAlegre  variable_resolution pnt
 #
 #           o EXP_NAME   : Forcing: ERA5, CFSR, GFS, etc.
 #           o EXP_RES    : mesh npts : 535554 etc
@@ -27,29 +27,35 @@
 #           o Domain     : Domain: global or regional
 #           o AreaRegion : PortoAlegre, Belem, global
 #           o TypeGrid   : quasi_uniform or variable_resolution
+#           o opt_pnt    : restart optios "pnt" or clm
 #
 #
 # For benchmark:
 #
 #  Extreme event in southern Brazil (flooding)
 #
-#./runPost.bash    GFS   163842   2024042700  2024050100  regional  Sul      variable_resolution
+#./runPost.bash    ERA5   40962   1997010100  1997020100  global    global       quasi_uniform pnt
+#./runPost.bash    ERA5   40962   2013043000  2013050400  regional  Norte        quasi_uniform pnt
+#./runPost.bash    ERA5   40962   1997010100  1999030100  global    global       quasi_uniform pnt
+#./runPost.bash    GFS   163842   2024042700  2024050100  regional  Sul          variable_resolution pnt
+#./runPost.bash    GFS    40962   2024042700  2024050100  regional  PortoAlegre  quasi_uniform pnt
 #
 #    Hurricane Catarina
 #
-#./runPost.bash    ERA5  163842   2004032400  2004032800  regional  Sul       variable_resolution
+#./runPost.bash    ERA5  163842   2004032400  2004032800  regional  Sul         variable_resolution  pnt
+#./runPost.bash    ERA5   40962   2004032400  2004032800  regional  Sul         quasi_uniform  pnt
 #
 #   meteorological instability line LI-NORDESTE
 #
-#./runPost.bash    ERA5  163842   2010101600  2010102000  regional  Nordeste  variable_resolution
+#./runPost.bash    ERA5  163842   2010101600  2010102000  regional  Nordeste  variable_resolution  pnt
 #
 #   meteorological instability line LI-NORTE
 #
-#./runPost.bash    ERA5  163842   2013043000  2013050400  regional  Norte     variable_resolution
+#./runPost.bash    ERA5  163842   2013043000  2013050400  regional  Norte     variable_resolution  pnt
 #
 #   meteorological easterly wave  NORDESTE
 #
-#./runPost.bash    ERA5  163842   2019052500  2019052900  regional  Nordeste  variable_resolution
+#./runPost.bash    ERA5  163842   2019052500  2019052900  regional  Nordeste  variable_resolution  pnt
 #
 #
 # !REVISION HISTORY:
@@ -71,7 +77,7 @@ function usage(){
 # Verificando argumentos de entrada
 #
 
-if [ $# -ne 7 ]; then
+if [ $# -ne 8 ]; then
    usage
    exit 1
 fi
@@ -86,16 +92,17 @@ export LABELF=${4}
 export Domain=${5}
 export AreaRegion=${6}  #Belem 
 export TypeGrid=${7}
+export opt_pnt=${8}
 
 export GREEN='\033[1;32m'  # Green
 export RED='\033[1;31m' # Red
 export NC='\033[0m'        # No Color
 
-source scripts/VarEnvironmental.bash
-source scripts/Function_SetResolution.bash
-source scripts/Function_SetClusterConfig.bash
-source scripts/Function_RunPost.bash
-source scripts/Function_Create_ctl.bash
+source ${path_run}/scripts/VarEnvironmental.bash
+source ${path_run}/scripts/Function_SetResolution.bash
+source ${path_run}/scripts/Function_SetClusterConfig.bash
+source ${path_run}/scripts/Function_RunPost.bash
+source ${path_run}/scripts/Function_Create_ctl.${opt_pnt}.bash
 
  VarEnvironmental "export Environmental Variable "
  Function_SetResolution ${EXP_RES} ${TypeGrid} 'set resolution '
@@ -107,7 +114,7 @@ echo $RES_KM
 echo -e  "${GREEN}==>${NC} Creating submition scripts runpost, atmosphere_model...\n"
 echo -e  "${GREEN}==>${NC} post_convert.sh...\n"
 
- Function_RunPost  ${RES_KM} ${EXP_NAME} ${EXP_RES} ${LABELI} ${LABELF}  ${Domain} ${AreaRegion} ${TypeGrid}
+ Function_RunPost  ${RES_KM} ${EXP_NAME} ${EXP_RES} ${LABELI} ${LABELF}  ${Domain} ${AreaRegion} ${TypeGrid} ${opt_pnt}
 
 
 exit

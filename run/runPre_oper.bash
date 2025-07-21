@@ -32,11 +32,16 @@
 #
 #  Extreme event in southern Brazil (flooding)
 #
-#./runPre.bash    GFS   163842   2024042700  2024050100  regional  Sul  variable_resolution
+#./runPre.bash    ERA5   40962   1997010100  1997020100  global    global       quasi_uniform
+#./runPre.bash    ERA5   40962   2013043000  2013050400  regional  Norte        quasi_uniform
+#./runPre.bash    ERA5   40962   1997010100  1999030100  global    global       quasi_uniform
+#./runPre.bash    GFS   163842   2024042700  2024050100  regional  Sul          variable_resolution
+#./runPre.bash    GFS    40962   2024042700  2024050100  regional  PortoAlegre  quasi_uniform
 #
 #    Hurricane Catarina
 #
 #./runPre.bash    ERA5  163842   2004032400  2004032800  regional  Sul       variable_resolution
+#./runPre.bash    ERA5   40962   2004032400  2004032800  regional  Sul       quasi_uniform
 #
 #   meteorological instability line LI-NORDESTE
 #
@@ -89,29 +94,31 @@ export TypeGrid=${7}        #TypeGrid=variable_resolution
 #
 # Activity Functions
 #
-source scripts/VarEnvironmental.bash
-source scripts/Function_SetClusterConfig.bash
-source scripts/Function_GridRotate.bash
-source scripts/Function_SetResolution.bash
-source scripts/Function_RecDomain.bash
-source scripts/Function_PlotDomain.bash
-source scripts/Function_Static.bash
-source scripts/Function_Degrib_IC_ERA5.bash
-source scripts/Function_InitAtmos_IC_ERA5.bash
+export path_run=/mnt/beegfs/eduardo.khamis/issues/714/monan_oper/monan/run
 
-source scripts/Function_Degrib_IC_GFS.bash
-source scripts/Function_InitAtmos_IC_GFS.bash
+source ${path_run}/scripts/VarEnvironmental.bash
+source ${path_run}/scripts/Function_SetClusterConfig.bash
+source ${path_run}/scripts/Function_GridRotate.bash
+source ${path_run}/scripts/Function_SetResolution.bash
+source ${path_run}/scripts/Function_RecDomain.bash
+source ${path_run}/scripts/Function_PlotDomain.bash
+source ${path_run}/scripts/Function_Static.bash
+source ${path_run}/scripts/Function_Degrib_IC_ERA5.bash
+source ${path_run}/scripts/Function_InitAtmos_IC_ERA5.bash
 
-source scripts/Function_Degrib_LBC_GFS.bash
-source scripts/Function_InitAtmos_LBC_GFS.bash
+source ${path_run}/scripts/Function_Degrib_IC_GFS.bash
+source ${path_run}/scripts/Function_InitAtmos_IC_GFS.bash
 
-source scripts/Function_Degrib_LBC_ERA5.bash
-source scripts/Function_InitAtmos_LBC_ERA5.bash
+source ${path_run}/scripts/Function_Degrib_LBC_GFS.bash
+source ${path_run}/scripts/Function_InitAtmos_LBC_GFS.bash
 
-source scripts/Function_Degrib_SST_GFS.bash
+source ${path_run}/scripts/Function_Degrib_LBC_ERA5.bash
+source ${path_run}/scripts/Function_InitAtmos_LBC_ERA5.bash
 
-source scripts/Function_InitAtmos_SST_GFS.bash
-source scripts/Function_InitAtmos_SST_CLM.bash
+source ${path_run}/scripts/Function_Degrib_SST_GFS.bash
+
+source ${path_run}/scripts/Function_InitAtmos_SST_GFS.bash
+source ${path_run}/scripts/Function_InitAtmos_SST_CLM.bash
 #
 # Activity Modules
 #
@@ -157,9 +164,9 @@ echo -e  "${GREEN}==>${NC} Submiting InitAtmos_lbc_exe.sh...\n"
 
   Function_InitAtmos_LBC_ERA5  ${RES_KM} ${EXP_NAME} ${EXP_RES}  ${LABELI} ${LABELF} ${Domain} ${AreaRegion} ${TypeGrid}
 
-#echo -e  "${GREEN}==>${NC} Submiting CLM InitAtmosSST_exe.sh...\n"
+echo -e  "${GREEN}==>${NC} Submiting CLM InitAtmosSST_exe.sh...\n"
 
-#  Function_InitAtmos_SST_CLM    ${RES_KM} ${EXP_NAME} ${EXP_RES}  ${LABELI} ${LABELF} ${Domain} ${AreaRegion} ${TypeGrid}
+  Function_InitAtmos_SST_CLM    ${RES_KM} ${EXP_NAME} ${EXP_RES}  ${LABELI} ${LABELF} ${Domain} ${AreaRegion} ${TypeGrid}
 
 else
 

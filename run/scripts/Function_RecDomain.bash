@@ -52,8 +52,9 @@ if [ ${TypeGrid} = "variable_resolution" ]; then
   return 42
 fi
 cd ${SUBMIT_HOME}/pre/databcs/meshes/${TypeGrid}/
+path_grid=${SUBMIT_HOME}/pre/databcs/meshes/${TypeGrid}/
 path_rec=${SUBMIT_HOME}"/pre/databcs/meshes/regional_domain/"
-path_bin=${SUBMIT_HOME}"/pre/sources/MPAS-Tools/MPAS-Limited-Area/"
+path_bin=${SUBMIT_HOME}"/pre/sources/${USER_COMPILER}/MPAS-Tools/MPAS-Limited-Area/"
 
 if [ ${Domain} = "regional" ]; then
 echo "----------------------------"  
@@ -64,26 +65,39 @@ echo "----------------------------"
 #$ create_region           points        grid
 chmod 777 ${path_bin}/create_region 
 ${path_bin}/create_region     ${path_rec}/${AreaRegion}.ellipse.pts     global/${RES_KM}/x${frac}.${EXP_RES}.grid.nc
+${path_bin}/create_region     ${path_rec}/${AreaRegion}.ellipse.pts     global/${RES_KM}/x${frac}.${EXP_RES}.static.nc
 
 mkdir -p regional/${RES_KM}/
 
 mv ${AreaRegion}.graph.info  regional/${RES_KM}/${AreaRegion}.${EXP_RES}.graph.info
 mv ${AreaRegion}.grid.nc     regional/${RES_KM}/${AreaRegion}.${EXP_RES}.grid.nc
+mv ${AreaRegion}.static.nc   regional/${RES_KM}/${AreaRegion}.${EXP_RES}.static.nc
 
 ${path_mets}/gpmetis     -minconn     -contig    -niter=1000    regional/${RES_KM}/${AreaRegion}.${EXP_RES}.graph.info    128
 ${path_mets}/gpmetis     -minconn     -contig    -niter=1000    regional/${RES_KM}/${AreaRegion}.${EXP_RES}.graph.info    32
+${path_mets}/gpmetis     -minconn     -contig    -niter=1000    regional/${RES_KM}/${AreaRegion}.${EXP_RES}.graph.info    64
 ${path_mets}/gpmetis     -minconn     -contig    -niter=1000    regional/${RES_KM}/${AreaRegion}.${EXP_RES}.graph.info    256
 ${path_mets}/gpmetis     -minconn     -contig    -niter=1000    regional/${RES_KM}/${AreaRegion}.${EXP_RES}.graph.info    512
+${path_mets}/gpmetis     -minconn     -contig    -niter=1000    regional/${RES_KM}/${AreaRegion}.${EXP_RES}.graph.info    4
+${path_mets}/gpmetis     -minconn     -contig    -niter=1000    regional/${RES_KM}/${AreaRegion}.${EXP_RES}.graph.info    2
+ln -s ${path_grid}/regional/${RES_KM}/${AreaRegion}.${EXP_RES}.graph.info    regional/${RES_KM}/${AreaRegion}.${EXP_RES}.graph.info.part.1
+
 else
 echo "----------------------------"  
 echo "        GLOBAL DOMAIN       "  
 echo "----------------------------"  
 ln global/${RES_KM}/x${frac}.${EXP_RES}.graph.info  global/${RES_KM}/${AreaRegion}.${EXP_RES}.graph.info
 ln global/${RES_KM}/x${frac}.${EXP_RES}.grid.nc     global/${RES_KM}/${AreaRegion}.${EXP_RES}.grid.nc
+ln global/${RES_KM}/x${frac}.${EXP_RES}.static.nc   global/${RES_KM}/${AreaRegion}.${EXP_RES}.static.nc
 
 ${path_mets}/gpmetis     -minconn     -contig    -niter=1000    global/${RES_KM}/${AreaRegion}.${EXP_RES}.graph.info    128
 ${path_mets}/gpmetis     -minconn     -contig    -niter=1000    global/${RES_KM}/${AreaRegion}.${EXP_RES}.graph.info    32
+${path_mets}/gpmetis     -minconn     -contig    -niter=1000    global/${RES_KM}/${AreaRegion}.${EXP_RES}.graph.info    64
 ${path_mets}/gpmetis     -minconn     -contig    -niter=1000    global/${RES_KM}/${AreaRegion}.${EXP_RES}.graph.info    256
 ${path_mets}/gpmetis     -minconn     -contig    -niter=1000    global/${RES_KM}/${AreaRegion}.${EXP_RES}.graph.info    512
+${path_mets}/gpmetis     -minconn     -contig    -niter=1000    global/${RES_KM}/${AreaRegion}.${EXP_RES}.graph.info    4
+${path_mets}/gpmetis     -minconn     -contig    -niter=1000    global/${RES_KM}/${AreaRegion}.${EXP_RES}.graph.info    2
+ln -s  ${path_grid}/global/${RES_KM}/${AreaRegion}.${EXP_RES}.graph.info     global/${RES_KM}/${AreaRegion}.${EXP_RES}.graph.info.part.1
+
 fi
 }

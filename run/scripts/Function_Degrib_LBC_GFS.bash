@@ -69,31 +69,14 @@ NMLDIR=${BASEDIR}/pre/namelist/${version_model}
 EXPDIR=${RUNDIR}/${EXP}
 LOGDIR=${EXPDIR}/logs
 SCRDIR=${SUBMIT_HOME}/run/scripts
-EXECPATH=${SUBMIT_HOME}/pre/exec
+EXECPATH=${SUBMIT_HOME}/pre/exec/${version_model}/exec
 USERDATA=`echo ${EXP} | tr '[:upper:]' '[:lower:]'`
 
 OPERDIR=/oper/dados/ioper/tempo/${EXP}
 BNDDIR=$OPERDIR/0p25/brutos/${LABELI:0:4}/${LABELI:4:2}/${LABELI:6:2}/${LABELI:8:2}
+BNDDIR=${DATADIR}/global/gfs/${LABELI:0:4}${LABELI:4:2}${LABELI:6:2}${LABELI:8:2}
 
-echo $BNDDIR
-if [ ${Domain} = "global" ]; then
-    echo "----------------------------"  
-    echo "       /global DOMAIN      "  
-    echo "----------------------------"  
-    echo "nothing to do here"
-    return 66
-fi
-if [ ! -d ${BNDDIR} ]; then
-   echo "Condicao de contorno inexistente !"
-   echo "Verifique a data da rodada."
-   echo "$0 ${LABELI}"
-   exit 1                     # close for running only the model
-fi
-#
-# selected ncores to submission job
-#
-Function_SetClusterConfig ${EXP_RES} ${TypeGrid} 'set Function_SetClusterConfig '
-#
+
 #
 # Criando diretorio dados Estaticos
 #
@@ -115,36 +98,75 @@ if [  -e ${EXPDIR} ]; then
    mkdir -p ${EXPDIR}/wpsprd
    mkdir -p ${EXPDIR}/scripts
 fi
+echo $BNDDIR
+if [ ${Domain} = "global" ]; then
+    echo "----------------------------"  
+    echo "       /global DOMAIN      "  
+    echo "----------------------------"  
+    echo "nothing to do here"
+    return 66
+fi
+################################################################
+
+if [ ${Domain} = "regional" ]; then
+   echo "----------------------------"  
+   echo "       REGIONAL DOMAIN      "  
+   echo "----------------------------"  
+   path_reg=${DATADIR}/${Domain}/${USERDATA}/${LABELI}
+   if [ ! -d ${path_reg} ]; then
+      echo "Condicao de contorno inexistente !"
+      echo "Verifique a data da rodada."
+      echo "$0 ${path_reg}"
+      if [ ! -d ${BNDDIR} ]; then
+         echo "Condicao de contorno inexistente !"
+         echo "Verifique a data da rodada."
+         echo "$0 ${LABELI}"
+         exit 1                     # close for running only the model
+      else
+         cd ${EXPDIR}/wpsprd
+         path_reg=${DATADIR}/${Domain}/${USERDATA}/${LABELI}
+
+         nfiles=`ls -A ${EXPDIR}/wpsprd/gfs.t*z.pgrb2.0p25.f*.${LABELI}.grib2 | wc -l`
+         if [ ${nfiles} -le 20 ]; then
+            rm -f ${EXPDIR}/wpsprd/gfs.t*z.pgrb2.0p25.f*.${LABELI}.grib2*
+            filelist="${BNDDIR}/gfs.t*z.pgrb2.0p25.f*.${LABELI}.grib2"
+            for files in $filelist
+            do
+               filename=`basename $files`
+               nhour=`echo ${filename:21:3} | gawk '{print $1/1}' `
+               if [ ${nhour} -le 168 ] ; then    
+                  echo "Processing $filename file..."
+                   if [ ! -e ${path_reg}/${filename}  ]; then
+                      echo "File ${path_reg}/${filename} does not exist."
+                      CDI_INVENTORY_MODE=time  cdo sellonlatbox,260,350,-70,20 ${BNDDIR}/${filename}  ${path_reg}/${filename}
+                      ln -sf  ${path_reg}/${filename} ${EXPDIR}/wpsprd/${filename}
+                   else
+                      echo "File ${path_reg}/${filename} exists"
+                      ln -sf ${path_reg}/${filename} ${EXPDIR}/wpsprd/${filename}
+                   fi
+               fi 
+            done
+         else
+            echo "not copy gfs data"
+         fi 
+      fi
+   else
+     cd ${EXPDIR}/wpsprd
+     ln -sf ${path_reg}/* .
+
+   fi
+fi
+
+#
+# selected ncores to submission job
+#
+Function_SetClusterConfig ${EXP_RES} ${TypeGrid} 'set Function_SetClusterConfig '
+#
 #
 #
 #ln -sf ${BASEDIR}/${LABELI}/pre/runs/${EXP}/static/*.nc .
 #
-cd ${EXPDIR}/wpsprd
-path_reg=${DATADIR}/${Domain}/${USERDATA}/${LABELI}
 
-nfiles=`ls -A ${EXPDIR}/wpsprd/gfs.t*z.pgrb2.0p25.f*.${LABELI}.grib2 | wc -l`
-if [ ${nfiles} -le 20 ]; then
-  rm -f ${EXPDIR}/wpsprd/gfs.t*z.pgrb2.0p25.f*.${LABELI}.grib2*
-  filelist="${BNDDIR}/gfs.t*z.pgrb2.0p25.f*.${LABELI}.grib2"
-  for files in $filelist
-  do
-   filename=`basename $files`
-   nhour=`echo ${filename:21:3} | awk '{print $1/1}' `
-   if [ ${nhour} -le 168 ] ; then    
-     echo "Processing $filename file..."
-     if [ ! -e ${path_reg}/${filename}  ]; then
-        echo "File ${path_reg}/${filename} does not exist."
-        CDI_INVENTORY_MODE=time  cdo sellonlatbox,260,350,-70,20 ${BNDDIR}/${filename}  ${path_reg}/${filename}
-        ln -sf  ${path_reg}/${filename} ${EXPDIR}/wpsprd/${filename}
-     else
-        echo "File ${path_reg}/${filename} exists"
-        ln -sf ${path_reg}/${filename} ${EXPDIR}/wpsprd/${filename}
-     fi
-   fi 
-  done
-else
-  echo "not copy gfs data"
-fi 
 #
 #
 # scripts
@@ -206,7 +228,7 @@ rm -f GRIBFILE.* namelist.wps
 sed -e "s,#LABELI#,${start_date},g;s,#LABELF#,${end_date},g;s,#PREFIX#,GFS,g" \
 	 ${NMLDIR}/namelist.wps.LBC.${Domain} > ./namelist.wps
 
-${EXPDIR}/wpsprd/link_grib.csh gfs.t00z.pgrb2.0p25.f*.${LABELI}.grib2
+${EXPDIR}/wpsprd/link_grib.csh gfs.t00z.pgrb2.0p25.f*.*.grib2
 
 mpirun -np 1 ./ungrib.exe
 
@@ -217,7 +239,7 @@ rm -f GRIBFILE.*
 End=\`date +%s.%N\`
 echo  "FINISHED AT \`date\` "
 echo \$End   >>Timing.degrib
-echo \$Start \$End | awk '{print \$2 - \$1" sec"}' >> Timing.degrib
+echo \$Start \$End | gawk '{print \$2 - \$1" sec"}' >> Timing.degrib
 
 grep "Successful completion of program ungrib.exe" ungrib.log >& /dev/null
 
@@ -237,12 +259,12 @@ fi
 #
    mv ungrib.log      ${LOGDIR}/ungrib.${start_date}.log
    mv Timing.degrib   ${LOGDIR}
-   mv namelist.wps degrib_lbc_exe.sh ${EXPDIR}/scripts
+   mv namelist.wps ${EXPDIR}/scripts
    rm -f ${EXPDIR}/wpsprd/link_grib.csh
    cd ..
    ln -sf wpsprd/GFS\:* .
 
-   find ${EXPDIR}/wpsprd -maxdepth 1 -type l -exec rm -f {} \;
+#   find ${EXPDIR}/wpsprd -maxdepth 1 -type l -exec rm -f {} \;
 
 echo "End of degrib Job"
 
@@ -253,6 +275,11 @@ chmod +x ${EXPDIR}/degrib_lbc_exe.sh
 
 cd ${DIRMONAN_PRE_SCR}/${LABELI}/pre/runs/${EXP_NAME}
 
+echo sbatch --wait ${EXPDIR}/degrib_lbc_exe.sh
+if [ ${SLURM} = "NO" ]; then
+${EXPDIR}/degrib_lbc_exe.sh
+else
 sbatch --wait ${EXPDIR}/degrib_lbc_exe.sh
+fi
 
 }

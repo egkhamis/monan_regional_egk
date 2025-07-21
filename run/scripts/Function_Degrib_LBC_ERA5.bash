@@ -69,7 +69,7 @@ NMLDIR=${BASEDIR}/pre/namelist/${version_model}
 EXPDIR=${RUNDIR}/${EXP}
 LOGDIR=${EXPDIR}/logs
 SCRDIR=${SUBMIT_HOME}/run/scripts
-EXECPATH=${SUBMIT_HOME}/pre/exec
+EXECPATH=${SUBMIT_HOME}/pre/exec/${version_model}/exec
 USERDATA=`echo ${EXP} | tr '[:upper:]' '[:lower:]'`
 
 OPERDIR=/oper/dados/ioper/tempo/${EXP}
@@ -130,7 +130,7 @@ if [ ${nfiles} -le 20 ]; then
   for files in $filelist
   do
    filename=`basename $files`
-   nhour=`echo ${filename:21:3} | awk '{print $1/1}' `
+   nhour=`echo ${filename:21:3} | gawk '{print $1/1}' `
    if [ ${nhour} -le 168 ] ; then    
      echo "Processing $filename file..."
      if [ ! -e ${path_reg}/${filename}  ]; then
@@ -218,10 +218,10 @@ rm -f GRIBFILE.*
 End=\`date +%s.%N\`
 echo  "FINISHED AT \`date\` "
 echo \$End   >>Timing.degrib
-echo \$Start \$End | awk '{print \$2 - \$1" sec"}' >> Timing.degrib
+echo \$Start \$End | gawk '{print \$2 - \$1" sec"}' >> Timing.degrib
 
 grep "Successful completion of program ungrib.exe" ungrib.log >& /dev/null
-
+sleep 10
 if [ \$? -ne 0 ]; then
    echo "  BUMMER: Ungrib generation failed for some yet unknown reason."
    echo " "
@@ -238,12 +238,12 @@ fi
 #
    mv ungrib.log      ${LOGDIR}/ungrib.${start_date}.log
    mv Timing.degrib   ${LOGDIR}
-   mv namelist.wps degrib_lbc_exe.sh ${EXPDIR}/scripts
+   mv namelist.wps    ${EXPDIR}/scripts
    rm -f ${EXPDIR}/wpsprd/link_grib.csh
    cd ..
    ln -sf wpsprd/ERA5\:* .
 
-   find ${EXPDIR}/wpsprd -maxdepth 1 -type l -exec rm -f {} \;
+#   find ${EXPDIR}/wpsprd -maxdepth 1 -type l -exec rm -f {} \;
 
 echo "End of degrib Job"
 
@@ -254,6 +254,10 @@ chmod +x ${EXPDIR}/degrib_lbc_exe.sh
 
 cd ${DIRMONAN_PRE_SCR}/${LABELI}/pre/runs/${EXP_NAME}
 
-sbatch --wait ${EXPDIR}/degrib_lbc_exe.sh
+if [ ${SLURM} = "NO" ]; then
+  ${EXPDIR}/degrib_lbc_exe.sh
+else
+  sbatch --wait ${EXPDIR}/degrib_lbc_exe.sh
+fi
 
 }
