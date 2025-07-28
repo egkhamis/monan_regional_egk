@@ -16,7 +16,8 @@ function VarEnvironmental() {
     #export path_mets=/opt/ohpc/pub/libs/gnu9/metis/5.1.0/bin
     #export path_mets=/mnt/beegfs/paulo.kubota/monan_project/metis-5.1.0/build/Linux-x86_64/programs
 #    export path_mets=/mnt/beegfs/eduardo.khamis/issues/714/metis-5.1.0/build/Linux-x86_64/programs
-    export path_mets=$(pwd)/../../../metis-5.1.0/build/Linux-x86_64/programs
+#    export path_mets=$(pwd)/../../../metis-5.1.0/build/Linux-x86_64/programs
+    export path_mets=/mnt/beegfs/monan/714/metis-5.1.0/build/Linux-x86_64/programs
     #export NCARG_ROOT=/home/paulo_kubota/anaconda3/envs/ncl_stable
     export NCARG_ROOT=/usr/local/ncarg
     export NCARG_BIN=${NCARG_ROOT}/bin
