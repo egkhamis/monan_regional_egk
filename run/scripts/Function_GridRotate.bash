@@ -91,7 +91,8 @@ mv ${AreaRegion}.grid.nc     regional/${RES_KM}/${AreaRegion}.${EXP_RES}.grid.nc
 
 #path_mets=/mnt/beegfs/paulo.kubota/monan_project/metis-5.1.0/build/Linux-x86_64/programs
 #path_mets=/opt/ohpc/pub/libs/gnu9/metis/5.1.0/bin/gpmetis
-path_mets=/mnt/beegfs/eduardo.khamis/issues/714/metis-5.1.0/build/Linux-x86_64/programs
+#path_mets=/mnt/beegfs/eduardo.khamis/issues/714/metis-5.1.0/build/Linux-x86_64/programs
+path_mets=$(pwd)/../../../metis-5.1.0/build/Linux-x86_64/programs
 ${path_mets}/gpmetis     -minconn     -contig    -niter=1000    regional/${RES_KM}/${AreaRegion}.${EXP_RES}.graph.info    128
 ${path_mets}/gpmetis     -minconn     -contig    -niter=1000    regional/${RES_KM}/${AreaRegion}.${EXP_RES}.graph.info    32
 ${path_mets}/gpmetis     -minconn     -contig    -niter=1000    regional/${RES_KM}/${AreaRegion}.${EXP_RES}.graph.info    64
@@ -106,7 +107,8 @@ ln global/${RES_KM}/g${frac}.${EXP_RES}.grid.nc      global/${RES_KM}/${AreaRegi
 
 #path_mets=/mnt/beegfs/paulo.kubota/monan_project/metis-5.1.0/build/Linux-x86_64/programs
 #path_mets=/opt/ohpc/pub/libs/gnu9/metis/5.1.0/bin
-path_mets=/mnt/beegfs/eduardo.khamis/issues/714/metis-5.1.0/build/Linux-x86_64/programs
+#path_mets=/mnt/beegfs/eduardo.khamis/issues/714/metis-5.1.0/build/Linux-x86_64/programs
+path_mets=$(pwd)/../../../metis-5.1.0/build/Linux-x86_64/programs
 ${path_mets}/gpmetis     -minconn     -contig    -niter=1000    global/${RES_KM}/${AreaRegion}.${EXP_RES}.graph.info    128
 ${path_mets}/gpmetis     -minconn     -contig    -niter=1000    global/${RES_KM}/${AreaRegion}.${EXP_RES}.graph.info    32
 ${path_mets}/gpmetis     -minconn     -contig    -niter=1000    global/${RES_KM}/${AreaRegion}.${EXP_RES}.graph.info    64
