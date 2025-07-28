@@ -94,7 +94,8 @@ export TypeGrid=${7}        #TypeGrid=variable_resolution
 #
 # Activity Functions
 #
-export path_run=/mnt/beegfs/eduardo.khamis/issues/714/monan_oper/monan/run
+#export path_run=/mnt/beegfs/eduardo.khamis/issues/714/monan_oper/monan/run
+export path_run=$(pwd)
 
 source ${path_run}/scripts/VarEnvironmental.bash
 source ${path_run}/scripts/Function_SetClusterConfig.bash
