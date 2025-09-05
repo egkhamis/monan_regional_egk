@@ -50,7 +50,8 @@ if [ ${TypeGrid} = 'variable_resolution' ]; then
 path_exe=${SUBMIT_HOME}"/pre/databcs/meshes/"${TypeGrid}
 path_grid=${SUBMIT_HOME}/pre/databcs/meshes/${TypeGrid}/
 path_rec=${SUBMIT_HOME}"/pre/databcs/meshes/regional_domain/"
-path_bin=${SUBMIT_HOME}"/pre/sources/${USER_COMPILER}/MPAS-Tools/MPAS-Limited-Area/"
+#path_bin=${SUBMIT_HOME}"/pre/sources/${USER_COMPILER}/MPAS-Tools/MPAS-Limited-Area/"
+path_bin=${SUBMIT_HOME}"/pre/sources/MPAS-Tools/MPAS-Limited-Area/"
 path_in=${path_exe}
 path_out=${path_exe}
 input_filename=${path_exe}/global/${RES_KM/}/x${frac}.${EXP_RES}.grid.nc
@@ -80,6 +81,9 @@ echo "----------------------------"
 echo "       REGIONAL DOMAIN      "  
 echo "----------------------------"  
 chmod 777 ${path_bin}/create_region 
+
+#ativando python ambiente
+source ${path_bin}.venvj/bin/activate
 
 echo create_region     ${path_rec}/${AreaRegion}.ellipse.pts     global/${RES_KM}/g${frac}.${EXP_RES}.grid.nc
 ${path_bin}/create_region          ${path_rec}/${AreaRegion}.ellipse.pts     global/${RES_KM}/g${frac}.${EXP_RES}.grid.nc

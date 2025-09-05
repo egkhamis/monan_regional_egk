@@ -1,5 +1,5 @@
 #!/bin/bash -x
-path_prefix_in="/mnt/beegfs/paulo.kubota/monan_regional"
+path_prefix_in="/mnt/beegfs/monan/714/monan_oper/monan"
 path_prefix_out=`cd ..;pwd`
 
 # Define a function with local variables

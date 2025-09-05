@@ -203,10 +203,10 @@ rm latlon.nc
 mv latlon.nc  \${postname}
 done
 
-mv ${SUBMIT_HOME}/${LABELI}/model/runs/${EXP_NAME}/monanprd  ${SUBMIT_HOME}/${LABELI}/model/runs/${EXP_NAME}/monanprd_${LABELI}_${LABELF} 
-mkdir -p ${SUBMIT_HOME}/${LABELI}/model/runs/${EXP_NAME}/monanprd
+#mv ${SUBMIT_HOME}/${LABELI}/model/runs/${EXP_NAME}/monanprd  ${SUBMIT_HOME}/${LABELI}/model/runs/${EXP_NAME}/monanprd_${LABELI}_${LABELF} 
+#mkdir -p ${SUBMIT_HOME}/${LABELI}/model/runs/${EXP_NAME}/monanprd
 
-echo "End of degrib Job"
+echo "End of Post Job"
 
 exit 0
 EOF0

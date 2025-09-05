@@ -72,7 +72,7 @@
 #EOC
 
 function usage(){
-   sed -n '/^# !CALLING SEQUENCE:/,/^# !/{p}' ./runPre.bash | head -n -1
+   sed -n '/^# !CALLING SEQUENCE:/,/^# !/{p}' ./runPre_oper.bash | head -n -1
 }
 #
 # Verificando argumentos de entrada
@@ -145,7 +145,7 @@ echo -e  "${GREEN}==>${NC} Plot Domain.sh for...\n"
 
 echo -e  "${GREEN}==>${NC} Creating make_static.sh for submiting init_atmosphere...\n"
 
-  Function_static ${RES_KM} ${EXP_NAME} ${EXP_RES}  ${LABELI} ${Domain} ${AreaRegion} ${TypeGrid}
+Function_static ${RES_KM} ${EXP_NAME} ${EXP_RES}  ${LABELI} ${Domain} ${AreaRegion} ${TypeGrid}
 
 if [ ${EXP_NAME} = "ERA5" ]; then
 

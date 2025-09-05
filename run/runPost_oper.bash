@@ -70,7 +70,7 @@
 #-----------------------------------------------------------------------------!
 #EOC
 function usage(){
-   sed -n '/^# !CALLING SEQUENCE:/,/^# !/{p}' ./runPost.bash | head -n -1
+   sed -n '/^# !CALLING SEQUENCE:/,/^# !/{p}' ./runPost_oper.bash | head -n -1
 }
 
 #
@@ -98,11 +98,11 @@ export GREEN='\033[1;32m'  # Green
 export RED='\033[1;31m' # Red
 export NC='\033[0m'        # No Color
 
-source ${path_run}/scripts/VarEnvironmental.bash
-source ${path_run}/scripts/Function_SetResolution.bash
-source ${path_run}/scripts/Function_SetClusterConfig.bash
-source ${path_run}/scripts/Function_RunPost.bash
-source ${path_run}/scripts/Function_Create_ctl.${opt_pnt}.bash
+source scripts/VarEnvironmental.bash
+source scripts/Function_SetResolution.bash
+source scripts/Function_SetClusterConfig.bash
+source scripts/Function_RunPost.bash
+source scripts/Function_Create_ctl.${opt_pnt}.bash
 
  VarEnvironmental "export Environmental Variable "
  Function_SetResolution ${EXP_RES} ${TypeGrid} 'set resolution '

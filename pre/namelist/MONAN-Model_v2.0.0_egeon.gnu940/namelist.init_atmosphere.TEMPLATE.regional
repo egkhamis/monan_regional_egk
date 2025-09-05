@@ -69,12 +69,6 @@
                                           ! true or false (default: false)
 /
 &vertical_grid
-    config_specified_zeta_levels = 'L55.txt' != ''  The name of a text file containing a list of
-                                             ! vertical coordinate (zeta) values in increasing order at 
-                                             !layer interfaces."
-                                             ! cheack     config_nvertlevels = 55     
-                                             !The number of vertical levels to be used in the model
-                                             !Positive integer values (default: 55)
     config_ztop = 30000.0                 ! Model top height [m]
                                           ! Positive real values (default: 30000.0)
     config_nsmterrain = 1                 ! Number of smoothing passes to apply to the interpolated terrain field

@@ -2,7 +2,8 @@
     config_time_integration_order = 3
     config_dt = #STEPMODEL#
     config_start_time = '#LABELI#'
-    config_run_duration = '#LABELF#'
+    config_stop_time = '#LABELF#'
+    config_run_duration = 'none'
     config_split_dynamics_transport = true
     config_number_of_sub_steps = 2
     config_dynamics_split_steps = 3
