@@ -57,6 +57,9 @@ path_rec=${SUBMIT_HOME}"/pre/databcs/meshes/regional_domain/"
 #path_bin=${SUBMIT_HOME}"/pre/sources/${USER_COMPILER}/MPAS-Tools/MPAS-Limited-Area/"
 path_bin=${SUBMIT_HOME}"/pre/sources/MPAS-Tools/MPAS-Limited-Area/"
 
+#ativando python ambiente
+source ${path_bin}.venvj/bin/activate
+
 if [ ${Domain} = "regional" ]; then
 echo "----------------------------"  
 echo "       REGIONAL DOMAIN      "  
