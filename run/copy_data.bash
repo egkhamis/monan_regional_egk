@@ -1,5 +1,5 @@
 #!/bin/bash -x
-path_prefix_in="/mnt/beegfs/monan/714/monan_oper/monan"
+path_prefix_in="/mnt/beegfs/monan/dados/MONAN-Regional_v1.4.x"
 path_prefix_out=`cd ..;pwd`
 
 # Input variables:-----------------------------------------------------
@@ -14,6 +14,13 @@ echo "LABELI: ${YYYYMMDDHHi}"
 # Define a function with local variables
 
 copy_mesh_quasi_uniform() {
+  local path_in=${1}/pre/databcs/meshes/quasi_uniform/global/003_km
+  local path_out=${2}/pre/databcs/meshes/quasi_uniform/global/003_km
+
+  echo "cp -urfp: ${path_in} ${path_in}"
+  
+  cp -urfp ${path_in}/* ${path_out}/
+  
   local path_in=${1}/pre/databcs/meshes/quasi_uniform/global/015_km
   local path_out=${2}/pre/databcs/meshes/quasi_uniform/global/015_km
 
@@ -27,12 +34,32 @@ copy_mesh_quasi_uniform() {
   echo "cp -urfp: ${path_in} ${path_in}"
   
   cp -urfp ${path_in}/* ${path_out}/
+  
+  local path_in=${1}/pre/databcs/meshes/quasi_uniform/global/060_km
+  local path_out=${2}/pre/databcs/meshes/quasi_uniform/global/060_km
 
+  echo "cp -urfp: ${path_in} ${path_in}"
+  
+  cp -urfp ${path_in}/* ${path_out}/
+
+  local path_in=${1}/pre/databcs/meshes/quasi_uniform/global/120_km
+  local path_out=${2}/pre/databcs/meshes/quasi_uniform/global/120_km
+
+  echo "cp -urfp: ${path_in} ${path_in}"
+  
+  cp -urfp ${path_in}/* ${path_out}/
 }
 
 # Define a function with local variables
 
 copy_mesh_variable_resolution() {
+  local path_in=${1}/pre/databcs/meshes/variable_resolution/global/060_003km
+  local path_out=${2}/pre/databcs/meshes/variable_resolution/global/060_003km
+
+  echo "cp -urfp: ${path_in} ${path_in}"
+  
+  cp -urfp ${path_in}/* ${path_out}/
+
   local path_in=${1}/pre/databcs/meshes/variable_resolution/global/060_015km
   local path_out=${2}/pre/databcs/meshes/variable_resolution/global/060_015km
 
@@ -66,7 +93,7 @@ copy_mesh_WPS_GEOG() {
 # Define a function with local variables
 
 copy_mesh_datain_gfs() {
-  local path_in§=${1}/pre/datain/regional/gfs/
+  local path_in=${1}/pre/datain/regional/gfs/
   local path_out=${2}/pre/datain/regional/gfs/
 
   echo "cp -urfp: ${path_in} ${path_in}"

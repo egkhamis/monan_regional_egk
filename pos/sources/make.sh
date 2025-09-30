@@ -30,11 +30,14 @@
 #    SHAREDLIB=true - generate position-independent code suitable for use in a shared library. Default is false.
 
 source load_module_convert_mpas.bash
+source ../../../run/scripts/VarEnvironmental.bash
+
+VarEnvironmental
 
 export DIRroot=`cd ../../;pwd`
 
-export CONVERT_MPAS_DIR=${DIRroot}/sources/convert_mpas_v0.1.0_egeon.gnu940
-export MONAN_EXEC_DIR=${DIRroot}/exec/convert_mpas_v0.1.0_egeon.gnu940/
+export CONVERT_MPAS_DIR=${DIRroot}/sources/${version_pos}
+export MONAN_EXEC_DIR=${DIRroot}/exec/${version_pos}
 cd ${CONVERT_MPAS_DIR}
 echo ""
 echo -e  "${GREEN}==>${NC} Installing convert_mpas...\n"

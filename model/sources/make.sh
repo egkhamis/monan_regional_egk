@@ -50,7 +50,7 @@
 #    OPENACC=true  - builds and links with OpenACC flags. Default is to not use OpenACC.
 #    PRECISION=double - builds with default double-precision real kind. Default is to use single-precision.
 #    SHAREDLIB=true - generate position-independent code suitable for use in a shared library. Default is false.
-source ../../../run/load_module_gnu_lib.bash
+#source ../../../run/load_module_gnu_lib.bash
 source ../../../run/load_monan_app_modules.sh
 source ../../../run/scripts/VarEnvironmental.bash
 
@@ -63,18 +63,6 @@ export MONAN_SRC_DIR=${DIRhome}/sources/${version_model}
 export MONAN_EXE_DIR=${DIRroot}/exec/${version_model}
 export MONAN_EXE_PRE=${DIRroot}/../pre/exec/${version_model}
 
-#[jmas] - removido por usar em gnu_lib.bash
-#export NETCDF=/mnt/beegfs/monan/libs/netcdf
-#export PNETCDF=/mnt/beegfs/monan/libs/PnetCDF
-
-#[jmas] - debug
-#echo "version model = " ${version_model}
-#echo "monan src dir = " ${MONAN_SRC_DIR}
-#echo "monan exe dir = " ${MONAN_EXE_DIR}
-#echo "NETCDF = " ${NETCDF}
-#echo "PNETCDF = "${PNETCDF}
-#exit
-
 # PIO is not necessary for version 8.* If PIO is empty, MPAS Will use SMIOL
 export PIO=
 mkdir -p ${MONAN_SRC_DIR}/bin
@@ -83,7 +71,6 @@ rm  ${MONAN_SRC_DIR}/bin/atmosphere_model
 rm  ${MONAN_EXE_DIR}/exec/atmosphere_model   
 
 make clean CORE=atmosphere
-#make -j 8 gfortran CORE=atmosphere DEBUG=true OPENMP=true USE_PIO2=false PRECISION=single 2>&1 | tee make.output
 make -j 8 gfortran CORE=atmosphere OPENMP=true USE_PIO2=false PRECISION=single 2>&1 | tee make.output
 
 mkdir -p ${MONAN_SRC_DIR}/bin

@@ -76,7 +76,7 @@ sed -e "s,#FILEDATA#,${FILEDATA},g;s,#startlon#,${startlon},g;s,#endlon#,${endlo
 	 ${DIR_MESH}/plot_region.ncl > ${pathin}/plot_region.ncl
 ${path_ncl}/ncl ${pathin}/plot_region.ncl
 rm ${pathin}/plot_region.ncl
-mv ${pathin}/regional_mesh.png ${SUBMIT_HOME}/run
+mv ${pathin}/regional_mesh.png ${SUBMIT_HOME}/run/regional_mesh_${AreaRegion}_${EXP_RES}_${RES_KM}_${TypeGrid}.png
 else
 echo "----------------------------"  
 echo "        GLOBAL DOMAIN       "  

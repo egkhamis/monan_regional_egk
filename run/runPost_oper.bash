@@ -98,14 +98,15 @@ export GREEN='\033[1;32m'  # Green
 export RED='\033[1;31m' # Red
 export NC='\033[0m'        # No Color
 
-source scripts/VarEnvironmental.bash
-source scripts/Function_SetResolution.bash
-source scripts/Function_SetClusterConfig.bash
-source scripts/Function_RunPost.bash
-source scripts/Function_Create_ctl.${opt_pnt}.bash
+export path_run=`pwd`
+source ${path_run}/scripts/VarEnvironmental.bash
+source ${path_run}/scripts/Function_SetResolution.bash
+source ${path_run}/scripts/Function_SetClusterConfig.bash
+source ${path_run}/scripts/Function_RunPost.bash
+source ${path_run}/scripts/Function_Create_ctl.${opt_pnt}.bash
 
- VarEnvironmental "export Environmental Variable "
- Function_SetResolution ${EXP_RES} ${TypeGrid} 'set resolution '
+VarEnvironmental "export Environmental Variable "
+Function_SetResolution ${EXP_RES} ${TypeGrid} 'set resolution '
 
 echo $RES_KM
 
@@ -114,7 +115,7 @@ echo $RES_KM
 echo -e  "${GREEN}==>${NC} Creating submition scripts runpost, atmosphere_model...\n"
 echo -e  "${GREEN}==>${NC} post_convert.sh...\n"
 
- Function_RunPost  ${RES_KM} ${EXP_NAME} ${EXP_RES} ${LABELI} ${LABELF}  ${Domain} ${AreaRegion} ${TypeGrid} ${opt_pnt}
+Function_RunPost  ${RES_KM} ${EXP_NAME} ${EXP_RES} ${LABELI} ${LABELF}  ${Domain} ${AreaRegion} ${TypeGrid} ${opt_pnt}
 
 
 exit

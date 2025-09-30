@@ -64,7 +64,7 @@
 #EOC
 
 function usage(){
-   sed -n '/^# !CALLING SEQUENCE:/,/^# !/{p}' ./runModel.bash | head -n -1
+   sed -n '/^# !CALLING SEQUENCE:/,/^# !/{p}' ./runModel_oper.bash | head -n -1
 }
 
 #
